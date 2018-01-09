@@ -1,0 +1,369 @@
+x-standard-responses: &standard-responses
+  400:
+    description: "Request is invalid. See response body for details."
+    schema:
+      "$ref": "#/definitions/error_response"
+  401:
+    description: "Correct credentials were not provided."
+    schema:
+      "$ref": "#/definitions/error_response"
+  403:
+    description: "This action is forbidden."
+    schema:
+      "$ref": "#/definitions/error_response"
+  404:
+    description: "The resource could not be found at this location."
+    schema:
+      "$ref": "#/definitions/error_response"
+  500:
+    description: "An internal error caused the request to fail. Contact support for help."
+    schema:
+      "$ref": "#/definitions/error_response"
+
+x-list-response-headers:
+  headers: &list-response-headers
+    Link:
+      description: Links for the first, next, prev, and last pages relative to the request.
+      type: string
+    X-Total-Count:
+      description: Count of total results
+      type: integer
+
+swagger: "2.0"
+info:
+  description: "It's myBox."
+  version: "0.1.0"
+  title: "my-box-v1"
+schemes:
+  - http
+host: "localhost:8080"
+basePath: "/my-box/v1"
+produces:
+  - "application/json"
+consumes:
+  - "application/json"
+
+tags:
+  - name: Folders
+    description: Operations for folders
+  - name: Documents
+    description: Operations for documents
+  - name: Folder contents
+    description: Operations for adding and removing documents from folders
+
+paths:
+  /folders:
+    get:
+      tags:
+        - Folders
+      summary: "Get folders"
+      description: "Get folders"
+      responses:
+        200:
+          description: "Returned successfully."
+          headers:
+            <<: *list-response-headers
+          schema:
+            "$ref": "#/definitions/folder_list"
+        <<: *standard-responses
+
+    post:
+      tags:
+        - Folders
+      summary: "Create a folder"
+      description: "Create a folder"
+      parameters:
+        - "$ref": "#/parameters/folder"
+      responses:
+        201:
+          description: "Created successfully."
+          schema:
+            "$ref": "#/definitions/folder"
+        <<: *standard-responses
+
+  /folders/{folder_id}:
+    get:
+      tags:
+        - Folders
+      summary: "Get a folder"
+      description: "Get a folder"
+      parameters:
+        - "$ref": "#/parameters/folder_id"
+      responses:
+        200:
+          description: "Returned successfully."
+          schema:
+            "$ref": "#/definitions/folder"
+        <<: *standard-responses
+
+    put:
+      tags:
+        - Folders
+      summary: "Modify a folder"
+      description: "Modify a folder"
+      parameters:
+        - "$ref": "#/parameters/folder_id"
+        - "$ref": "#/parameters/folder"
+      responses:
+        205:
+          description: "Updated successfully."
+          schema:
+            "$ref": "#/definitions/folder"
+        <<: *standard-responses
+
+    delete:
+      tags:
+        - Folders
+      summary: "Delete a folder"
+      description: "Delete a folder"
+      parameters:
+        - "$ref": "#/parameters/folder_id"
+      responses:
+        204:
+          description: "Deleted successfully."
+        <<: *standard-responses
+
+  /documents:
+    get:
+      tags:
+        - Documents
+      summary: "Get documents"
+      description: "Get documents"
+      responses:
+        200:
+          description: "Returned successfully."
+          headers:
+            <<: *list-response-headers
+          schema:
+            "$ref": "#/definitions/document_list"
+        <<: *standard-responses
+
+    post:
+      tags:
+        - Documents
+      summary: "Create a document"
+      description: "Create a document"
+      parameters:
+        - "$ref": "#/parameters/document"
+      responses:
+        201:
+          description: "Created successfully."
+          schema:
+            "$ref": "#/definitions/document"
+        <<: *standard-responses
+
+  /documents/{document_id}:
+    get:
+      tags:
+        - Documents
+      summary: "Get a document"
+      description: "Get a document"
+      parameters:
+        - "$ref": "#/parameters/document_id"
+      responses:
+        200:
+          description: "Returned successfully."
+          schema:
+            "$ref": "#/definitions/document"
+        <<: *standard-responses
+
+    put:
+      tags:
+        - Documents
+      summary: "Modify a document"
+      description: "Modify a document"
+      parameters:
+        - "$ref": "#/parameters/document_id"
+        - "$ref": "#/parameters/document"
+      responses:
+        205:
+          description: "Updated successfully."
+          schema:
+            "$ref": "#/definitions/document"
+        <<: *standard-responses
+
+    delete:
+      tags:
+        - Documents
+      summary: "Delete a document"
+      description: "Delete a document"
+      parameters:
+        - "$ref": "#/parameters/document_id"
+      responses:
+        204:
+          description: "Deleted successfully."
+        <<: *standard-responses
+
+  /folders/{folder_id}/contents:
+    get:
+      tags:
+        - Folder contents
+      summary: "Get the contents of a folder"
+      description: "Get the contents of a folder"
+      parameters:
+        - "$ref": "#/parameters/folder_id"
+      responses:
+        200:
+          description: "Returned successfully."
+          headers:
+            <<: *list-response-headers
+          schema:
+            "$ref": "#/definitions/content_list"
+        <<: *standard-responses
+
+  /folders/{folder_id}/contents/{document_id}:
+    post:
+      tags:
+        - Folder contents
+      summary: "Add a document to a folder"
+      description: "Add a document to a folder"
+      parameters:
+        - "$ref": "#/parameters/folder_id"
+        - "$ref": "#/parameters/document_id"
+      responses:
+        200:
+          description: "Updated successfully."
+          schema:
+            "$ref": "#/definitions/content"
+        <<: *standard-responses
+
+    delete:
+      tags:
+        - Folder contents
+      summary: "Remove a document from a folder"
+      description: "Remove a document from a folder"
+      parameters:
+        - "$ref": "#/parameters/folder_id"
+        - "$ref": "#/parameters/document_id"
+      responses:
+        204:
+          description: "Deleted successfully."
+        <<: *standard-responses
+
+definitions:
+  error_response:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Error message
+      errors:
+        type: array
+        description: List of specific errors in this request
+        items:
+          "$ref": "#/definitions/error_details"
+
+  error_details:
+    type: object
+    properties:
+      resource:
+        type: string
+        description: Resource
+      field:
+        type: string
+        description: Field
+      reason:
+        type: string
+        description: Reason for error
+
+  folder:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of the folder
+      created:
+        type: string
+        format: date-time
+        description: Date this app was created
+        readOnly: true
+      last_modified:
+        type: string
+        format: date-time
+        description: Date this app was last modified
+        readOnly: true
+    required:
+      - name
+
+  folder_list:
+    type: array
+    description: List of folders
+    items:
+      "$ref": "#/definitions/folder"
+
+  document:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Name of the document
+      text:
+        type: string
+        description: Text of the document
+      created:
+        type: string
+        format: date-time
+        description: Date this app was created
+        readOnly: true
+      last_modified:
+        type: string
+        format: date-time
+        description: Date this app was last modified
+        readOnly: true
+    required:
+      - name
+      - text
+
+  document_list:
+    type: array
+    description: List of documents
+    items:
+      "$ref": "#/definitions/document"
+
+  content:
+    type: object
+    properties:
+      documentId:
+        type: string
+        description: ID of the document
+        readOnly: true
+      created:
+        type: string
+        format: date-time
+        description: Date this app was created
+        readOnly: true
+
+  content_list:
+    type: array
+    description: List of contents
+    items:
+      "$ref": "#/definitions/content"
+
+parameters:
+  folder:
+    name: folder
+    in: body
+    description: "Folder object"
+    required: true
+    schema:
+      "$ref": "#/definitions/folder"
+  folder_id:
+    name: folder_id
+    in: path
+    description: "ID for the folder"
+    required: true
+    type: string
+
+  document:
+    name: document
+    in: body
+    description: "Text document"
+    required: true
+    schema:
+      "$ref": "#/definitions/document"
+  document_id:
+    name: document_id
+    in: path
+    description: "ID for the document"
+    required: true
+    type: string
