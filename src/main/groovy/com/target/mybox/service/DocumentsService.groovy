@@ -1,6 +1,7 @@
 package com.target.mybox.service
 
 import com.target.mybox.domain.Document
+import com.target.mybox.exception.DocumentNotFoundException
 import com.target.mybox.repository.DocumentsRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -16,7 +17,11 @@ class DocumentsService {
   }
 
   Document get(String documentId) {
-    return documentsRepository.findOne(documentId)
+    Document document = documentsRepository.findOne(documentId)
+    if (!document) {
+      throw new DocumentNotFoundException()
+    }
+    return document
   }
 
   Document create(Document document) {
@@ -24,6 +29,9 @@ class DocumentsService {
   }
 
   Document update(Document document) {
+    if (!exists(document.id)) {
+      throw new DocumentNotFoundException()
+    }
     return documentsRepository.save(document)
   }
 
@@ -31,5 +39,9 @@ class DocumentsService {
     if (documentsRepository.exists(documentId)) {
       documentsRepository.delete(documentId)
     }
+  }
+
+  boolean exists(String documentId) {
+    return documentsRepository.exists(documentId)
   }
 }

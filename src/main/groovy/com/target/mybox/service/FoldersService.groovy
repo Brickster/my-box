@@ -1,6 +1,7 @@
 package com.target.mybox.service
 
 import com.target.mybox.domain.Folder
+import com.target.mybox.exception.FolderNotFoundException
 import com.target.mybox.repository.FoldersRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -16,7 +17,11 @@ class FoldersService {
   }
 
   Folder get(String folderId) {
-    return foldersRepository.findOne(folderId)
+    Folder folder = foldersRepository.findOne(folderId)
+    if (!folder) {
+      throw new FolderNotFoundException()
+    }
+    return folder
   }
 
   Folder create(Folder folder) {
@@ -24,6 +29,9 @@ class FoldersService {
   }
 
   Folder update(Folder folder) {
+    if (!exists(folder.id)) {
+      throw new FolderNotFoundException()
+    }
     return foldersRepository.save(folder)
   }
 
@@ -31,5 +39,9 @@ class FoldersService {
     if (foldersRepository.exists(folderId)) {
       foldersRepository.delete(folderId)
     }
+  }
+
+  boolean exists(String folderId) {
+    return foldersRepository.exists(folderId)
   }
 }
