@@ -4,7 +4,7 @@ services:
     image: mongo:3.4
     container_name: mongo-my-box
   my-box:
-    image: my-box
+    image: brickster/my-box:latest
     container_name: my-box
     ports:
       - '8080:8080'
