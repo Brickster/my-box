@@ -4,6 +4,8 @@ import com.target.mybox.domain.Document
 import com.target.mybox.exception.DocumentNotFoundException
 import com.target.mybox.repository.DocumentsRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,8 +14,8 @@ class DocumentsService {
   @Autowired
   DocumentsRepository documentsRepository
 
-  List<Document> getAll() {
-    return documentsRepository.findAll()
+  Page<Document> getAll(Pageable pageable) {
+    return documentsRepository.findAll(pageable)
   }
 
   Document get(String documentId) {

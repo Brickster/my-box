@@ -4,6 +4,8 @@ import com.target.mybox.domain.Folder
 import com.target.mybox.exception.FolderNotFoundException
 import com.target.mybox.repository.FoldersRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,8 +14,8 @@ class FoldersService {
   @Autowired
   FoldersRepository foldersRepository
 
-  List<Folder> getAll() {
-    return foldersRepository.findAll()
+  Page<Folder> getAll(Pageable pageable) {
+    return foldersRepository.findAll(pageable)
   }
 
   Folder get(String folderId) {

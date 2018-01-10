@@ -1,8 +1,11 @@
 package com.target.mybox.controller
 
 import com.target.mybox.domain.Document
+import com.target.mybox.exception.PageMustBePositiveException
 import com.target.mybox.service.DocumentsService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -20,8 +23,11 @@ class DocumentsController {
   DocumentsService documentsService
 
   @GetMapping
-  List<Document> getDocuments() {
-    return documentsService.getAll()
+  List<Document> getDocuments(@PageableDefault(page = 0, size = 5) Pageable pageable) {
+    if (pageable.pageNumber < 0) {
+      throw new PageMustBePositiveException()
+    }
+    return documentsService.getAll(pageable).content
   }
 
   @GetMapping('/{documentId}')

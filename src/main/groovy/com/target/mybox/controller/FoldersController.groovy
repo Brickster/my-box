@@ -1,8 +1,11 @@
 package com.target.mybox.controller
 
 import com.target.mybox.domain.Folder
+import com.target.mybox.exception.PageMustBePositiveException
 import com.target.mybox.service.FoldersService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -20,8 +23,12 @@ class FoldersController {
   FoldersService foldersService
 
   @GetMapping
-  List<Folder> getFolders() {
-    return foldersService.getAll()
+  List<Folder> getFolders(@PageableDefault(page = 0, size = 5) Pageable pageable) {
+    // NOTE: intentionally error on numbers greater than 0 rather than less than
+    if (pageable.pageNumber > 0) {
+      throw new PageMustBePositiveException()
+    }
+    return foldersService.getAll(pageable).content
   }
 
   @GetMapping('/{folderId}')

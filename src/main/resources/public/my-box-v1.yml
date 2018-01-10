@@ -58,6 +58,9 @@ paths:
         - Folders
       summary: "Get folders"
       description: "Get folders"
+      parameters:
+        - "$ref": "#/parameters/page"
+        - "$ref": "#/parameters/per_page"
       responses:
         200:
           description: "Returned successfully."
@@ -129,6 +132,9 @@ paths:
         - Documents
       summary: "Get documents"
       description: "Get documents"
+      parameters:
+        - "$ref": "#/parameters/page"
+        - "$ref": "#/parameters/per_page"
       responses:
         200:
           description: "Returned successfully."
@@ -202,6 +208,8 @@ paths:
       description: "Get the contents of a folder"
       parameters:
         - "$ref": "#/parameters/folder_id"
+        - "$ref": "#/parameters/page"
+        - "$ref": "#/parameters/per_page"
       responses:
         200:
           description: "Returned successfully."
@@ -340,6 +348,21 @@ definitions:
       "$ref": "#/definitions/content"
 
 parameters:
+  page:
+    name: page
+    in: query
+    description: 'Page number (example: page=0)'
+    required: false
+    type: integer
+    default: 0
+  per_page:
+    name: per_page
+    in: query
+    description: 'Page size (example: size=10)'
+    required: false
+    type: integer
+    default: 5
+
   folder:
     name: folder
     in: body

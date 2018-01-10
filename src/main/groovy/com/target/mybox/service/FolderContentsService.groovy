@@ -6,6 +6,8 @@ import com.target.mybox.exception.FolderAlreadyContainsDocumentException
 import com.target.mybox.exception.FolderNotFoundException
 import com.target.mybox.repository.FolderContentsRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,11 +22,11 @@ class FolderContentsService {
   @Autowired
   DocumentsService documentsService
 
-  List<FolderContent> getAllByFolder(String folderId) {
+  Page<FolderContent> getAllByFolder(String folderId, Pageable pageable) {
     if (!foldersService.exists(folderId)) {
       throw new FolderNotFoundException()
     }
-    return folderContentsRepository.findAllByFolderId(folderId)
+    return folderContentsRepository.findAllByFolderId(folderId, pageable)
   }
 
   FolderContent create(FolderContent folderContent) {
