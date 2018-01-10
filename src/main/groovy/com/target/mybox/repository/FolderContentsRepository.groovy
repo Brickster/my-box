@@ -6,4 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface FolderContentsRepository extends MongoRepository<FolderContent, String> {
   List<FolderContent> findAllByFolderId(String folderId)
   long deleteByFolderIdAndDocumentId(String folderId, String documentId)
+  boolean existsByFolderIdAndDocumentId(String folderId, String documentId)
 }
