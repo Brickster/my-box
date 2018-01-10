@@ -1,9 +1,10 @@
 version: '2'
 services:
-  mongo-local:
+  mongo-my-box:
     image: mongo:3.4
-    container_name: mongo-local
+    container_name: mongo-my-box
+  my-box:
+    image: my-box
+    container_name: my-box
     ports:
-      - '27017:27017'
-    volumes:
-      - /private/var/tmp/data:/data/db
+      - '8080:8080'
