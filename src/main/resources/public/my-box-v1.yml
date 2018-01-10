@@ -252,14 +252,24 @@ definitions:
   error_response:
     type: object
     properties:
+      timestamp:
+        type: string
+        description: The request timestamp
+      status:
+        type: integer
+        description: Error status code
+      error:
+        type: string
+        description: Error status message
+      exception:
+        type: string
+        description: Error type
       message:
         type: string
         description: Error message
-      errors:
-        type: array
-        description: List of specific errors in this request
-        items:
-          "$ref": "#/definitions/error_details"
+      path:
+        type: string
+        description: The request path that caused this error
 
   error_details:
     type: object
