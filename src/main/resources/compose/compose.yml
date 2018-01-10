@@ -1,0 +1,17 @@
+version: '2'
+services:
+  mongo-my-box:
+    image: mongo:3.4
+    container_name: mongo-my-box
+  my-box:
+    image: my-box
+    container_name: my-box
+    ports:
+      - '8080:8080'
+  my-box-swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: my-box-swagger-ui
+    ports:
+      - '8090:8080'
+    environment:
+      - 'API_URL=http://localhost:8080/swagger.yml'
