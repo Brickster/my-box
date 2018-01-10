@@ -26,6 +26,6 @@ docker-compose -f src/main/resources/compose/compose.yml down
 
 ---
 
-<a name="myfootnote1">1</a>: Until you shut kill the application, Docker, Earth, etc. Then your stuff is gone. Sorry.</br>
+<a name="myfootnote1">1</a>: Until you kill the application, Docker, Earth, etc. Then your stuff is gone. Sorry.</br>
 <a name="myfootnote2">2</a>: Nice!</br>
 <a name="myfootnote3">3</a>: That sounded better in my head.
