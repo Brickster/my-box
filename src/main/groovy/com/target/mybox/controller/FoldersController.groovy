@@ -49,7 +49,7 @@ class FoldersController {
     return foldersService.update(folder)
   }
 
-  @DeleteMapping('/{folderId')
+  @DeleteMapping('/{folderId}')
   @ResponseStatus(HttpStatus.GONE)
   void deleteFolder(@PathVariable String folderId) {
     foldersService.delete(folderId)
