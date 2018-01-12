@@ -2,7 +2,7 @@ version: '2'
 services:
   my-box-mongo:
     image: mongo:3.4
-    container_name: mongo-my-box
+    container_name: my-box-mongo
   my-box:
     image: brickster/my-box:latest
     container_name: my-box
