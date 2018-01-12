@@ -5,3 +5,4 @@ spring:
       host: my-box-mongo
 
 server.contextPath: /my-box/v1
+server.error.whitelabel.enabled: false
