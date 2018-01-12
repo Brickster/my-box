@@ -39,7 +39,7 @@ class DocumentsService {
 
   void delete(String documentId) {
     if (documentsRepository.exists(documentId)) {
-      documentsRepository.delete(documentId)
+      // intentionally blank
     }
   }
 
