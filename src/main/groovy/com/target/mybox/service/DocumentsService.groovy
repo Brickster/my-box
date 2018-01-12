@@ -31,9 +31,11 @@ class DocumentsService {
   }
 
   Document update(Document document) {
-    if (!exists(document.id)) {
+    Document existingDocument = documentsRepository.findOne(document.id)
+    if (!existingDocument) {
       throw new DocumentNotFoundException()
     }
+    document.created = existingDocument.created
     return documentsRepository.save(document)
   }
 

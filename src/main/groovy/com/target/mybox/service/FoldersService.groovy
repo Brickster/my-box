@@ -31,9 +31,11 @@ class FoldersService {
   }
 
   Folder update(Folder folder) {
-    if (!exists(folder.id)) {
+    Folder existingFolder = foldersRepository.findOne(folder.id)
+    if (!existingFolder) {
       throw new FolderNotFoundException()
     }
+    folder.created = existingFolder.created
     return foldersRepository.save(folder)
   }
 
