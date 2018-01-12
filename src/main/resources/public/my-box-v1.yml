@@ -122,7 +122,7 @@ paths:
       parameters:
         - "$ref": "#/parameters/folder_id"
       responses:
-        204:
+        410:
           description: "Deleted successfully."
         <<: *standard-responses
 
@@ -196,7 +196,7 @@ paths:
       parameters:
         - "$ref": "#/parameters/document_id"
       responses:
-        204:
+        410:
           description: "Deleted successfully."
         <<: *standard-responses
 
@@ -244,7 +244,7 @@ paths:
         - "$ref": "#/parameters/folder_id"
         - "$ref": "#/parameters/document_id"
       responses:
-        204:
+        410:
           description: "Deleted successfully."
         <<: *standard-responses
 
