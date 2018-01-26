@@ -229,8 +229,8 @@ paths:
         - "$ref": "#/parameters/folder_id"
         - "$ref": "#/parameters/document_id"
       responses:
-        200:
-          description: "Updated successfully."
+        201:
+          description: "Created successfully."
           schema:
             "$ref": "#/definitions/content"
         <<: *standard-responses
@@ -341,7 +341,7 @@ definitions:
   content:
     type: object
     properties:
-      documentId:
+      document_id:
         type: string
         description: ID of the document
         readOnly: true
