@@ -38,11 +38,13 @@ class DocumentsController {
   }
 
   @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
   Document postDocument(@RequestBody Document document) {
     return documentsService.create(document)
   }
 
   @PutMapping('/{documentId}')
+  @ResponseStatus(HttpStatus.RESET_CONTENT)
   Document putDocument(@PathVariable String documentId, @RequestBody Document document) {
     document.id = documentId
     return documentsService.update(document)

@@ -28,6 +28,7 @@ class FolderContentsController {
   }
 
   @PostMapping('/{documentId}')
+  @ResponseStatus(HttpStatus.CREATED)
   FolderContent postFolderContent(@PathVariable String folderId, @PathVariable String documentId) {
     return folderContentsService.create(new FolderContent(folderId: folderId, documentId:  documentId))
   }

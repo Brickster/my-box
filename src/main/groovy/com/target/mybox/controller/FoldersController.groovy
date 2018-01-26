@@ -39,11 +39,13 @@ class FoldersController {
   }
 
   @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
   Folder postFolder(@RequestBody Folder folder) {
     return foldersService.create(folder)
   }
 
   @PutMapping('/{folderId}')
+  @ResponseStatus(HttpStatus.RESET_CONTENT)
   Folder putFolder(@PathVariable String folderId, @RequestBody Folder folder) {
     folder.id = folderId
     return foldersService.update(folder)
