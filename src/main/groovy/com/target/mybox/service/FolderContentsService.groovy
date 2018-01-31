@@ -24,16 +24,12 @@ class FolderContentsService {
   DocumentsService documentsService
 
   Page<FolderContent> getAllByFolder(String folderId, Pageable pageable) {
-    if (!foldersService.exists(folderId)) {
-      throw new FolderNotFoundException()
-    }
+    confirmFolderExists(folderId)
     return folderContentsRepository.findAllByFolderId(folderId, pageable)
   }
 
   FolderContent create(FolderContent folderContent) {
-    if (!foldersService.exists(folderContent.folderId)) {
-      throw new FolderNotFoundException()
-    }
+    confirmFolderExists(folderContent.folderId)
     if (!documentsService.exists(folderContent.documentId)) {
       throw new DocumentNotFoundException()
     }
@@ -51,9 +47,13 @@ class FolderContentsService {
   }
 
   void delete(String folderId, String documentId) {
+    confirmFolderExists(folderId)
+    folderContentsRepository.deleteByFolderIdAndDocumentId(folderId, documentId)
+  }
+
+  private void confirmFolderExists(String folderId) {
     if (!foldersService.exists(folderId)) {
       throw new FolderNotFoundException()
     }
-    folderContentsRepository.deleteByFolderIdAndDocumentId(folderId, documentId)
   }
 }
