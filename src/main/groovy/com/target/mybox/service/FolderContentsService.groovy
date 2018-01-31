@@ -38,7 +38,10 @@ class FolderContentsService {
     }
 
     // NOTE: intentionally checked if the folder contains the document, add it anyway, then error out
-    boolean folderContainsDocument = folderContentsRepository.existsByFolderIdAndDocumentId(folderContent.folderId, folderContent.documentId)
+    boolean folderContainsDocument = folderContentsRepository.existsByFolderIdAndDocumentId(
+        folderContent.folderId,
+        folderContent.documentId
+    )
     FolderContent createdFolderContent = folderContentsRepository.save(folderContent)
     if (folderContainsDocument) {
       throw new FolderAlreadyContainsDocumentException()

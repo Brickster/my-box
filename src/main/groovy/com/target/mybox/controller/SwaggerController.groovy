@@ -16,7 +16,7 @@ class SwaggerController {
   @GetMapping(value = '/swagger.yml', produces = MediaType.TEXT_PLAIN_VALUE)
   ResponseEntity<String> getSwaggerYml() {
 
-    InputStream inputStream = getClass().getResourceAsStream("/public/my-box-v1.yml")
+    InputStream inputStream = getClass().getResourceAsStream('/public/my-box-v1.yml')
     String fileContents = StreamUtils.copyToString(inputStream, Charset.defaultCharset())
 
     HttpHeaders httpHeaders = new HttpHeaders()

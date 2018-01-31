@@ -5,12 +5,18 @@ import groovy.util.logging.Slf4j
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.HttpRequestMethodNotSupportedException
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 
 @Slf4j
 @RestController
 @ControllerAdvice
 class ErrorController implements org.springframework.boot.autoconfigure.web.ErrorController {
+
+  String errorPath = '/error'
 
   @ExceptionHandler([MyBoxException])
   ResponseEntity<ErrorResponse> handleMyBoxException(MyBoxException e) {
@@ -36,11 +42,6 @@ class ErrorController implements org.springframework.boot.autoconfigure.web.Erro
   ErrorResponse handleUnknownException(Exception e) {
     log.error("unknown error occurred: ${e.getClass().getSimpleName()}", e)
     new ErrorResponse(error: 'InternalServerErrorException', message: 'An unknown error occurred')
-  }
-
-  @Override
-  String getErrorPath() {
-    return '/error'
   }
 
   static class ErrorResponse {

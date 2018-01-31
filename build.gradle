@@ -11,6 +11,7 @@ buildscript {
   }
 }
 
+apply plugin: 'codenarc'
 apply plugin: 'groovy'
 apply plugin: 'org.springframework.boot'
 
@@ -35,4 +36,10 @@ dependencies {
 
   // jackson support for Java 8 date & time API
   compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.1"
+
+  codenarc "org.codenarc:CodeNarc:1.1"
+}
+
+codenarc {
+  configFile rootProject.file('gradle/codenarc/codenarc.groovy')
 }

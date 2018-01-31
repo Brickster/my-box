@@ -39,6 +39,7 @@ class DocumentsService {
     return documentsRepository.save(document)
   }
 
+  @SuppressWarnings('EmptyIfStatement')
   void delete(String documentId) {
     if (documentsRepository.exists(documentId)) {
       // intentionally blank
