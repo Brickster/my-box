@@ -1,5 +1,6 @@
 package com.target.mybox.controller
 
+import groovy.transform.CompileStatic
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 
 import java.nio.charset.Charset
 
+@CompileStatic
 @RestController
 class SwaggerController {
 

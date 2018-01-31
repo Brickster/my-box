@@ -1,6 +1,7 @@
 package com.target.mybox.controller
 
 import com.target.mybox.exception.MyBoxException
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @Slf4j
+@CompileStatic
 @RestController
 @ControllerAdvice
 class ErrorController implements org.springframework.boot.autoconfigure.web.ErrorController {
@@ -27,7 +29,7 @@ class ErrorController implements org.springframework.boot.autoconfigure.web.Erro
           responseStatus.code()
       )
     }
-    return handleUnknownException(e)
+    return new ResponseEntity<ErrorResponse>(handleUnknownException(e), HttpStatus.INTERNAL_SERVER_ERROR)
   }
 
   @ExceptionHandler([HttpRequestMethodNotSupportedException])

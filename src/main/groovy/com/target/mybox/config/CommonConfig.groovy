@@ -3,10 +3,12 @@ package com.target.mybox.config
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.SerializationFeature
+import groovy.transform.CompileStatic
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.config.EnableMongoAuditing
 
+@CompileStatic
 @Configuration
 @EnableMongoAuditing
 class CommonConfig {

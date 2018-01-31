@@ -3,6 +3,7 @@ package com.target.mybox.controller
 import com.target.mybox.domain.FolderContent
 import com.target.mybox.exception.PageMustBePositiveException
 import com.target.mybox.service.FolderContentsService
+import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
+@CompileStatic
 @RestController
 @RequestMapping('/folders/{folderId}/contents')
 class FolderContentsController {
