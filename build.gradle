@@ -3,20 +3,28 @@ version '1.0-SNAPSHOT'
 
 buildscript {
   repositories {
+    jcenter()
     mavenCentral()
   }
 
   dependencies {
     classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE'
+    classpath 'com.avast.gradle:gradle-docker-compose-plugin:0.6.12'
   }
 }
 
 apply plugin: 'codenarc'
 apply plugin: 'groovy'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'docker-compose'
 
 repositories {
   mavenCentral()
+}
+
+configurations {
+  integrationTestCompile.extendsFrom testCompile
+  integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -45,6 +53,16 @@ dependencies {
   testCompile 'cglib:cglib-nodep:3.2.4'
 }
 
+sourceSets {
+  integrationTest {
+    groovy {
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
+      srcDir file('src/integrationTest/groovy')
+    }
+  }
+}
+
 codenarc {
   configFile rootProject.file('gradle/codenarc/codenarc.groovy')
 }
@@ -52,3 +70,32 @@ codenarc {
 codenarcTest {
   configFile rootProject.file('gradle/codenarc/codenarcTest.groovy')
 }
+
+codenarcIntegrationTest {
+  configFile rootProject.file('gradle/codenarc/codenarcTest.groovy')
+}
+
+task integrationTest(type: Test) {
+  String testEnvArg = '-Dspring.profiles.active=test'
+
+  if (jvmArgs) {
+    jvmArgs.add(testEnvArg)
+  } else {
+    jvmArgs = [testEnvArg]
+  }
+
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+  classpath = sourceSets.integrationTest.runtimeClasspath
+  outputs.upToDateWhen { false }
+}
+
+dockerCompose.isRequiredBy(integrationTest)
+
+dockerCompose {
+  useComposeFiles = ['src/test/resources/compose/compose-test.yml']
+  executable = '/usr/local/bin/docker-compose'
+  dockerExecutable = '/usr/local/bin/docker'
+}
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test

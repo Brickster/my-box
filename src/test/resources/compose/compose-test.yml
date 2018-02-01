@@ -1,0 +1,7 @@
+version: '2'
+services:
+  my-box-mongo-test:
+    image: mongo:3.4
+    container_name: my-box-mongo-test
+    ports:
+      - '27017:27017'
