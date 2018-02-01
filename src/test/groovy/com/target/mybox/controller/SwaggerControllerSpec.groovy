@@ -15,8 +15,6 @@ class SwaggerControllerSpec extends Specification {
 
     then:
     responseEntity.body.contains('swagger: "2.0"')
-    responseEntity.headers.getFirst('Access-Control-Allow-Origin') == '*'
-    responseEntity.headers.getFirst('Access-Control-Allow-Methods') == 'GET'
     responseEntity.statusCode == HttpStatus.OK
   }
 }

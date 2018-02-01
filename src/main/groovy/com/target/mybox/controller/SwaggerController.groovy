@@ -1,7 +1,6 @@
 package com.target.mybox.controller
 
 import groovy.transform.CompileStatic
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -21,11 +20,6 @@ class SwaggerController {
     InputStream inputStream = getClass().getResourceAsStream('/public/my-box-v1.yml')
     String fileContents = StreamUtils.copyToString(inputStream, Charset.defaultCharset())
 
-    HttpHeaders httpHeaders = new HttpHeaders()
-    httpHeaders.add('Access-Control-Allow-Origin', '*')
-    httpHeaders.add('Access-Control-Allow-Methods', 'GET')
-    ResponseEntity<String> response = new ResponseEntity<>(fileContents, httpHeaders, HttpStatus.OK)
-
-    return response
+    return new ResponseEntity<>(fileContents, HttpStatus.OK)
   }
 }
