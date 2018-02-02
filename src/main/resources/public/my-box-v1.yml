@@ -50,6 +50,8 @@ tags:
     description: Operations for documents
   - name: Folder contents
     description: Operations for adding and removing documents from folders
+  - name: Status
+    description: API status
 
 paths:
   /folders:
@@ -248,6 +250,30 @@ paths:
           description: "Deleted successfully."
         <<: *standard-responses
 
+  /health:
+    get:
+      tags:
+        - Status
+      summary: API health
+      description: API health
+      responses:
+        200:
+          description: 'Health returned successfully.'
+          schema:
+            $ref: '#/definitions/health'
+
+  /info:
+    get:
+      tags:
+        - Status
+      summary: API info
+      description: API info
+      responses:
+        200:
+          description: 'Info return successfully.'
+          schema:
+            $ref: '#/definitions/info'
+
 definitions:
   error_response:
     type: object
@@ -356,6 +382,30 @@ definitions:
     description: List of contents
     items:
       "$ref": "#/definitions/content"
+
+  health:
+    type: object
+    properties:
+      status:
+        type: string
+        description: 'API status'
+      mongo:
+        type: object
+        description: 'Mongo health'
+        properties:
+          status:
+            type: string
+            description: 'Mongo status'
+          version:
+            type: string
+            description: 'Mongo version'
+
+  info:
+    type: object
+    properties:
+      version:
+        type: string
+        description: 'API version'
 
 parameters:
   page:

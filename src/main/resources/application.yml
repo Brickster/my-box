@@ -4,6 +4,20 @@ spring:
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
       host: my-box-mongo
 
+# disable all but health and info actuator endpoints
+endpoints:
+  enabled: false
+  info.enabled: true
+  health.enabled: true
+
+# allow sensitive health indicators
+management.security.enabled: false
+management.health.diskspace.enabled: false
+endpoints.health.sensitive: true
+
+# CORS settings for actuator endpoints
+endpoints.cors.allowed-origins: http://localhost:8090
+
 server.contextPath: /my-box/v1
 server.error.whitelabel.enabled: false
 
