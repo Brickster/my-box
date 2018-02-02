@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
+import javax.validation.Valid
+
 @CompileStatic
 @RestController
 @RequestMapping('/documents')
@@ -41,13 +43,13 @@ class DocumentsController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  Document postDocument(@RequestBody Document document) {
+  Document postDocument(@RequestBody @Valid Document document) {
     return documentsService.create(document)
   }
 
   @PutMapping('/{documentId}')
   @ResponseStatus(HttpStatus.RESET_CONTENT)
-  Document putDocument(@PathVariable String documentId, @RequestBody Document document) {
+  Document putDocument(@PathVariable String documentId, @RequestBody @Valid Document document) {
     document.id = documentId
     return documentsService.update(document)
   }

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
+import javax.validation.Valid
+
 @CompileStatic
 @RestController
 @RequestMapping('/folders')
@@ -42,13 +44,13 @@ class FoldersController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  Folder postFolder(@RequestBody Folder folder) {
+  Folder postFolder(@RequestBody @Valid Folder folder) {
     return foldersService.create(folder)
   }
 
   @PutMapping('/{folderId}')
   @ResponseStatus(HttpStatus.RESET_CONTENT)
-  Folder putFolder(@PathVariable String folderId, @RequestBody Folder folder) {
+  Folder putFolder(@PathVariable String folderId, @RequestBody @Valid Folder folder) {
     folder.id = folderId
     return foldersService.update(folder)
   }

@@ -6,6 +6,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.HttpRequestMethodNotSupportedException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RequestMapping
@@ -28,6 +29,20 @@ class ErrorController implements org.springframework.boot.autoconfigure.web.Erro
           new ErrorResponse(error: e.getClass().getSimpleName(), message: responseStatus.reason()),
           responseStatus.code()
       )
+    }
+    return new ResponseEntity<ErrorResponse>(handleUnknownException(e), HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+
+  @ExceptionHandler([MethodArgumentNotValidException])
+  ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+
+    if (e.bindingResult.getFieldErrorCount()) {
+      String message = e.bindingResult.getFieldErrors().collect { "${it.field} ${it.defaultMessage}" }.join('; ')
+      ErrorResponse errorResponse = new ErrorResponse(
+          error: MethodArgumentNotValidException.getSimpleName(),
+          message: message
+      )
+      return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST)
     }
     return new ResponseEntity<ErrorResponse>(handleUnknownException(e), HttpStatus.INTERNAL_SERVER_ERROR)
   }
