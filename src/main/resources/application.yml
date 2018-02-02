@@ -7,4 +7,4 @@ spring:
 server.contextPath: /my-box/v1
 server.error.whitelabel.enabled: false
 
-swagger_ui.url: http://localhost:8090
+swagger-ui.url: http://localhost:8090

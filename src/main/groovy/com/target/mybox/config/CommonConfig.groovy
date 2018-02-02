@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableMongoAuditing
 class CommonConfig extends WebMvcConfigurerAdapter {
 
-  @Value('${swagger_ui.url}')
+  @Value('${swagger-ui.url}')
   String swaggerUiUrl
 
   @Bean
