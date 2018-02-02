@@ -1,3 +1,5 @@
+api.version: 1.0.0
+
 spring:
   data:
     mongodb:
@@ -16,7 +18,7 @@ management.health.diskspace.enabled: false
 endpoints.health.sensitive: true
 
 # CORS settings for actuator endpoints
-endpoints.cors.allowed-origins: http://localhost:8090
+endpoints.cors.allowed-origins: ${swagger-ui.url}
 
 server.contextPath: /my-box/v1
 server.error.whitelabel.enabled: false
