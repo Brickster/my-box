@@ -31,6 +31,5 @@ class DocumentControllerIntegrationSpec extends IntegrationSpec {
     createdDocument.text == document.text
     createdDocument.created
     createdDocument.lastModified
-    false
   }
 }
