@@ -1,0 +1,16 @@
+dist: trusty
+language: groovy
+jdk:
+  - oraclejdk8
+
+sudo: required
+services:
+  - docker
+
+# called out in Travis documentations (https://docs.travis-ci.com/user/languages/groovy#Gradle-Caching)
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
