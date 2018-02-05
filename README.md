@@ -1,8 +1,8 @@
-# myBox API
+# my-box
 
 Your box. Your stuff.<sup>[1](#myfootnote1)</sup>
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/brickster/my-box.svg)](https://hub.docker.com/r/brickster/my-box/)
+[![Build Status](https://travis-ci.org/Brickster/my-box.svg?branch=master)](https://travis-ci.org/Brickster/my-box) [![Docker Pulls](https://img.shields.io/docker/pulls/brickster/my-box.svg)](https://hub.docker.com/r/brickster/my-box/)
 
 ### Getting Started
 
