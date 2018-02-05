@@ -7,6 +7,13 @@ sudo: required
 services:
   - docker
 
+before_install:
+  - docker pull mongo:3.4
+  - docker run -d -p '27017:27017' --name travis-mongo mongo:3.4
+
+script:
+  ./gradlew check --exclude-task composeUp --exclude-task composeDown
+
 # called out in Travis documentations (https://docs.travis-ci.com/user/languages/groovy#Gradle-Caching)
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
