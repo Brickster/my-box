@@ -30,6 +30,7 @@ class DocumentsControllerSpec extends Specification {
     0 * _
 
     actual == expected
+    false
   }
 
   void 'getDocuments throws exception when page is negative'() {
