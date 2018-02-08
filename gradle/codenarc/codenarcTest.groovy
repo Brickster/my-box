@@ -101,7 +101,7 @@ ruleset {
   NoTabCharacter
   ParameterReassignment
   TernaryCouldBeElvis
-  TrailingComma
+//  TrailingComma
   VariableTypeRequired
   VectorIsObsolete
 
@@ -176,7 +176,7 @@ ruleset {
   ClosureStatementOnOpeningLineOfMultipleLineClosure
   ConsecutiveBlankLines
   FileEndsWithoutNewline
-  Indentation(spacesPerIndentLevel: 2)
+//  Indentation(spacesPerIndentLevel: 2)  // gets confused by block names
 //  LineLength
   MissingBlankLineAfterImports
   MissingBlankLineAfterPackage

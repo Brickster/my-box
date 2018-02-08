@@ -25,6 +25,8 @@ repositories {
 configurations {
   integrationTestCompile.extendsFrom testCompile
   integrationTestRuntime.extendsFrom testRuntime
+  functionalTestCompile.extendsFrom testCompile
+  functionalTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -65,6 +67,13 @@ sourceSets {
       srcDir file('src/integrationTest/groovy')
     }
   }
+  functionalTest {
+    groovy {
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
+      srcDir file('src/functionalTest/groovy')
+    }
+  }
 }
 
 codenarc {
@@ -76,6 +85,10 @@ codenarcTest {
 }
 
 codenarcIntegrationTest {
+  configFile rootProject.file('gradle/codenarc/codenarcTest.groovy')
+}
+
+codenarcFunctionalTest {
   configFile rootProject.file('gradle/codenarc/codenarcTest.groovy')
 }
 
@@ -93,7 +106,22 @@ task integrationTest(type: Test) {
   outputs.upToDateWhen { false }
 }
 
+task functionalTest(type: Test) {
+  String testEnvArg = '-Dspring.profiles.active=test'
+
+  if (jvmArgs) {
+    jvmArgs.add(testEnvArg)
+  } else {
+    jvmArgs = [testEnvArg]
+  }
+
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
+  outputs.upToDateWhen { false }
+}
+
 dockerCompose.isRequiredBy(integrationTest)
+dockerCompose.isRequiredBy(functionalTest)
 
 dockerCompose {
   useComposeFiles = ['src/test/resources/compose/compose-test.yml']
@@ -103,3 +131,5 @@ dockerCompose {
 
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
+check.dependsOn functionalTest
+functionalTest.mustRunAfter integrationTest
