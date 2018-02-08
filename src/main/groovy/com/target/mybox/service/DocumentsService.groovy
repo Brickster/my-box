@@ -15,6 +15,9 @@ class DocumentsService {
   @Autowired
   DocumentsRepository documentsRepository
 
+  @Autowired
+  FolderContentsService folderContentsService
+
   Page<Document> getAll(Pageable pageable) {
     return documentsRepository.findAll(pageable)
   }
@@ -43,7 +46,8 @@ class DocumentsService {
   @SuppressWarnings('EmptyIfStatement')
   void delete(String documentId) {
     if (documentsRepository.exists(documentId)) {
-      // intentionally blank
+      // do not delete the document itself
+      folderContentsService.deleteByDocumentId(documentId)
     }
   }
 

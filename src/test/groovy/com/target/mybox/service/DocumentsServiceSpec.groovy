@@ -15,7 +15,8 @@ import java.time.Instant
 class DocumentsServiceSpec extends Specification {
 
   DocumentsService documentsService = new DocumentsService(
-      documentsRepository: Mock(DocumentsRepository)
+      documentsRepository: Mock(DocumentsRepository),
+      folderContentsService: Mock(FolderContentsService)
   )
 
   String documentId = 'd1'
@@ -121,13 +122,14 @@ class DocumentsServiceSpec extends Specification {
 
     then:
     1 * documentsService.documentsRepository.exists(documentId) >> exists
+    deleteContentsInterations * documentsService.folderContentsService.deleteByDocumentId(documentId)
     0 * documentsService.documentsRepository.delete(documentId)  // delete should never happen. This is intentional.
     0 * _
 
     where:
-    exists | _
-    true   | _
-    false  | _
+    exists | deleteContentsInterations
+    true   | 1
+    false  | 0
   }
 
   void 'exists'() {

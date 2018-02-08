@@ -142,4 +142,14 @@ class FolderContentsServiceSpec extends Specification {
 
     thrown(FolderNotFoundException)
   }
+
+  void 'delete by document ID'() {
+
+    when:
+    folderContentsService.deleteByDocumentId(documentId)
+
+    then:
+    1 * folderContentsService.folderContentsRepository.deleteByDocumentId(documentId)
+    0 * _
+  }
 }

@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository
 @CompileStatic
 interface FolderContentsRepository extends MongoRepository<FolderContent, String> {
   Page<FolderContent> findAllByFolderId(String folderId, Pageable pageable)
+  long deleteByDocumentId(String documentId)
   long deleteByFolderIdAndDocumentId(String folderId, String documentId)
   boolean existsByFolderIdAndDocumentId(String folderId, String documentId)
 }

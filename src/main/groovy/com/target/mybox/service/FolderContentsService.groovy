@@ -51,6 +51,10 @@ class FolderContentsService {
     folderContentsRepository.deleteByFolderIdAndDocumentId(folderId, documentId)
   }
 
+  void deleteByDocumentId(String documentId) {
+    folderContentsRepository.deleteByDocumentId(documentId)
+  }
+
   private void confirmFolderExists(String folderId) {
     if (!foldersService.exists(folderId)) {
       throw new FolderNotFoundException()
