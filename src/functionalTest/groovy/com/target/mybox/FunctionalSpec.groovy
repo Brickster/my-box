@@ -74,6 +74,10 @@ class FunctionalSpec extends Specification {
     return restTemplate.postForEntity(uri(api), resource, Map)
   }
 
+  ResponseEntity<Map<String, Object>> postError(String api, Object resource = null) {
+    return post(api, resource)
+  }
+
   ResponseEntity<Map<String, Object>> put(String api, Object resource = null) {
     return restTemplate.exchange(uri(api), HttpMethod.PUT, new HttpEntity<Object>(resource), Map)
   }
