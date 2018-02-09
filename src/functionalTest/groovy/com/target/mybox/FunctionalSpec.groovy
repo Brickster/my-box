@@ -31,7 +31,7 @@ class FunctionalSpec extends Specification {
 
   RestTemplate restTemplate
 
-  String date1Iso = '2016-01-02T03:04:05Z'
+  String date1Iso = '2016-01-02T03:04:05.000Z'
   Instant date1 = Instant.ofEpochMilli(1451703845000)
   String date2Iso = '2016-11-12T13:14:15.016Z'
   Instant date2 = Instant.ofEpochMilli(1478956455016)

@@ -1,5 +1,6 @@
 package com.target.mybox.domain
 
+import com.target.mybox.annotation.JsonIsoFormat
 import groovy.transform.CompileStatic
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
@@ -15,8 +16,10 @@ class Folder {
   String id
   @NotBlank
   String name
+  @JsonIsoFormat
   @CreatedDate
   Instant created
+  @JsonIsoFormat
   @LastModifiedDate
   Instant lastModified
 }
