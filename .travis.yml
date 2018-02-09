@@ -14,6 +14,9 @@ before_install:
 script:
   ./gradlew check --exclude-task composeUp --exclude-task composeDown
 
+after_success:
+  - if [[ -v $TRAVIS_TAG ]]; then ./docker/docker_push.sh; fi
+
 # called out in Travis documentations (https://docs.travis-ci.com/user/languages/groovy#Gradle-Caching)
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
