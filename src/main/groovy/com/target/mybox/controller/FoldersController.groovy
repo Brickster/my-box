@@ -1,12 +1,14 @@
 package com.target.mybox.controller
 
+import com.target.mybox.annotation.PageParam
+import com.target.mybox.annotation.SizeParam
 import com.target.mybox.domain.Folder
-import com.target.mybox.exception.PageMustBePositiveException
+import com.target.mybox.exception.PageMustNotBeNegativeException
+import com.target.mybox.exception.SizeMustBePositiveException
 import com.target.mybox.service.FoldersService
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Pageable
-import org.springframework.data.web.PageableDefault
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -29,12 +31,15 @@ class FoldersController {
   FoldersService foldersService
 
   @GetMapping
-  List<Folder> getFolders(@PageableDefault(page = 0, size = 5) Pageable pageable) {
+  List<Folder> getFolders(@PageParam int page, @SizeParam int size) {
     // NOTE: intentionally error on numbers greater than 0 rather than less than
-    if (pageable.pageNumber > 0) {
-      throw new PageMustBePositiveException()
+    if (page > 0) {
+      throw new PageMustNotBeNegativeException()
     }
-    return foldersService.getAll(pageable).content
+    if (size < 1) {
+      throw new SizeMustBePositiveException()
+    }
+    return foldersService.getAll(new PageRequest(0, size)).content
   }
 
   @GetMapping('/{folderId}')

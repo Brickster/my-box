@@ -1,12 +1,14 @@
 package com.target.mybox.controller
 
+import com.target.mybox.annotation.PageParam
+import com.target.mybox.annotation.SizeParam
 import com.target.mybox.domain.Document
-import com.target.mybox.exception.PageMustBePositiveException
+import com.target.mybox.exception.PageMustNotBeNegativeException
+import com.target.mybox.exception.SizeMustBePositiveException
 import com.target.mybox.service.DocumentsService
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Pageable
-import org.springframework.data.web.PageableDefault
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -29,11 +31,14 @@ class DocumentsController {
   DocumentsService documentsService
 
   @GetMapping
-  List<Document> getDocuments(@PageableDefault(page = 0, size = 5) Pageable pageable) {
-    if (pageable.pageNumber < 0) {
-      throw new PageMustBePositiveException()
+  List<Document> getDocuments(@PageParam int page, @SizeParam int size) {
+    if (page < 0) {
+      throw new PageMustNotBeNegativeException()
     }
-    return documentsService.getAll(pageable).content
+    if (size < 1) {
+      throw new SizeMustBePositiveException()
+    }
+    return documentsService.getAll(new PageRequest(page, size)).content
   }
 
   @GetMapping('/{documentId}')

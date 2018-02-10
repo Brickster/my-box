@@ -1,10 +1,9 @@
 package com.target.mybox.controller
 
 import com.target.mybox.domain.Folder
-import com.target.mybox.exception.PageMustBePositiveException
+import com.target.mybox.exception.PageMustNotBeNegativeException
 import com.target.mybox.service.FoldersService
 import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -21,15 +20,15 @@ class FoldersControllerSpec extends Specification {
   void 'getFolders'() {
 
     given:
-    Pageable pageable = Mock(Pageable)  // requires mocking since we need to make it negative
     List<Folder> expected = [new Folder()]
 
     when:
-    List<Folder> actual = foldersController.getFolders(pageable)
+    List<Folder> actual = foldersController.getFolders(page, 5)
 
     then:
-    1 * pageable.pageNumber >> page
-    1 * foldersController.foldersService.getAll(pageable) >> new PageImpl<>(expected)
+    1 * foldersController.foldersService.getAll({ Pageable pageable ->
+      pageable.pageNumber == 0 && pageable.pageSize == 5
+    }) >> new PageImpl<>(expected)
     0 * _
 
     actual == expected
@@ -38,6 +37,7 @@ class FoldersControllerSpec extends Specification {
     page | _
     0    | _
     -1   | _
+    -10  | _
   }
 
   // this confirms that a bug exists. DO NOT FIX.
@@ -47,12 +47,12 @@ class FoldersControllerSpec extends Specification {
     given:
 
     when:
-    foldersController.getFolders(new PageRequest(page, 10))
+    foldersController.getFolders(page, 10)
 
     then:
     0 * _
 
-    thrown(PageMustBePositiveException)
+    thrown(PageMustNotBeNegativeException)
 
     where:
     page | _

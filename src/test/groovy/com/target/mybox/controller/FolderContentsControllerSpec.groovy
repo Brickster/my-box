@@ -1,12 +1,13 @@
 package com.target.mybox.controller
 
 import com.target.mybox.domain.FolderContent
-import com.target.mybox.exception.PageMustBePositiveException
+import com.target.mybox.exception.PageMustNotBeNegativeException
+import com.target.mybox.exception.SizeMustBePositiveException
 import com.target.mybox.service.FolderContentsService
 import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class FolderContentsControllerSpec extends Specification {
 
@@ -20,32 +21,53 @@ class FolderContentsControllerSpec extends Specification {
   void 'getFolderContents'() {
 
     given:
-    Pageable pageable = new PageRequest(1, 10)
     List<FolderContent> expected = [new FolderContent()]
 
     when:
-    List<FolderContent> actual = folderContentsController.getFolderContents(folderId, pageable)
+    List<FolderContent> actual = folderContentsController.getFolderContents(folderId, 0, 5)
 
     then:
-    1 * folderContentsController.folderContentsService.getAllByFolder(folderId, pageable) >> new PageImpl<>(expected)
+    1 * folderContentsController.folderContentsService.getAllByFolder(folderId, { Pageable pageable ->
+      pageable.pageNumber == 0 && pageable.pageSize == 5
+    }) >> new PageImpl<>(expected)
     0 * _
 
     actual == expected
   }
 
-  void 'getFolderContents throw exception when page is negative'() {
-
-    given:
-    Pageable negativePage = Mock(Pageable)
+  void 'getFolderContents throws exception when page is negative using page=#page'() {
 
     when:
-    folderContentsController.getFolderContents(folderId, negativePage)
+    folderContentsController.getFolderContents(folderId, page, 5)
 
     then:
-    1 * negativePage.pageNumber >> -1
     0 * _
 
-    thrown(PageMustBePositiveException)
+    thrown(PageMustNotBeNegativeException)
+
+    where:
+    page | _
+    -1   | _
+    -2   | _
+    -10  | _
+  }
+
+  @Unroll
+  void 'getFolderContents throws exception when size is non-positive using size=#size'() {
+
+    when:
+    folderContentsController.getFolderContents(folderId, 0, size)
+
+    then:
+    0 * _
+
+    thrown(SizeMustBePositiveException)
+
+    where:
+    size | _
+    0    | _
+    -1   | _
+    -10  | _
   }
 
   void 'postFolderContent'() {

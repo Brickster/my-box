@@ -3,6 +3,8 @@ package com.target.mybox.controller
 import com.target.mybox.FunctionalSpec
 import com.target.mybox.domain.Document
 import com.target.mybox.domain.FolderContent
+import com.target.mybox.exception.PageMustNotBeNegativeException
+import com.target.mybox.exception.SizeMustBePositiveException
 import com.target.mybox.repository.DocumentsRepository
 import com.target.mybox.repository.FolderContentsRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -77,6 +79,7 @@ class DocumentsControllerFunctionalSpec extends FunctionalSpec {
     where:
     page | size | ids
     null | null | ['d1', 'd2', 'd3', 'd4', 'd5']
+    0    | null | ['d1', 'd2', 'd3', 'd4', 'd5']
     null | 6    | ['d1', 'd2', 'd3', 'd4', 'd5', 'd6']
     null | 7    | ['d1', 'd2', 'd3', 'd4', 'd5', 'd6']
     null | 100  | ['d1', 'd2', 'd3', 'd4', 'd5', 'd6']
@@ -86,16 +89,45 @@ class DocumentsControllerFunctionalSpec extends FunctionalSpec {
     1    | 4    | ['d5', 'd6']
     2    | 4    | []
     100  | 4    | []
+  }
 
-    // Spring treats these as null/null
-    0    | 0    | ['d1', 'd2', 'd3', 'd4', 'd5']
-    0    | null | ['d1', 'd2', 'd3', 'd4', 'd5']
-    null | 0    | ['d1', 'd2', 'd3', 'd4', 'd5']
+  @Unroll
+  void 'getting documents with a negative page returns an error using page=#page'() {
 
-    // Spring ignores negative paging numbers
-    -1   | -1   | ['d1', 'd2', 'd3', 'd4', 'd5']
-    -1   | null | ['d1', 'd2', 'd3', 'd4', 'd5']
-    null | -1   | ['d1', 'd2', 'd3', 'd4', 'd5']
+    when:
+    ResponseEntity<Map<String, Object>> response = getError('/documents', ['page': page])
+
+    then:
+    response.statusCode == HttpStatus.BAD_REQUEST
+    response.body.size() == 2
+    response.body['error'] == PageMustNotBeNegativeException.getSimpleName()
+    response.body['message'] == 'Page must not be negative'
+
+    where:
+    page | _
+    -1   | _
+    -2   | _
+    -10  | _
+  }
+
+  @Unroll
+  void 'getting documents with a non-positive size returns an error using size=#size'() {
+
+    when:
+    ResponseEntity<Map<String, Object>> response = getError('/documents', ['size': size])
+
+    then:
+    response.statusCode == HttpStatus.BAD_REQUEST
+    response.body.size() == 2
+    response.body['error'] == SizeMustBePositiveException.getSimpleName()
+    response.body['message'] == 'Size must be positive'
+
+    where:
+    size | _
+    0    | _
+    -1   | _
+    -2   | _
+    -10  | _
   }
 
   void 'getting a document returns a document'() {
