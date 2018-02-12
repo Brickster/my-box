@@ -3,7 +3,10 @@ package com.target.mybox.controller
 import com.target.mybox.exception.MyBoxException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.BindingResult
+import org.springframework.validation.FieldError
 import org.springframework.web.HttpRequestMethodNotSupportedException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ResponseStatus
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -33,6 +36,49 @@ class ErrorControllerSpec extends Specification {
     exception                                           | error                                                      | message                     | statusCode
     new ErrorControllerExceptionWithResponseStatus()    | ErrorControllerExceptionWithResponseStatus.getSimpleName() | 'reason'                    | HttpStatus.BAD_REQUEST
     new ErrorControllerExceptionWithoutResponseStatus() | 'InternalServerErrorException'                             | 'An unknown error occurred' | HttpStatus.INTERNAL_SERVER_ERROR
+  }
+
+  void 'handle MethodArgumentNotValidException with field errors'() {
+
+    given:
+    List<FieldError> fieldErrors = [new FieldError('test', 'name', 'is required'), new FieldError('test', 'birth_date', 'must be in the past')]
+    BindingResult bindingResult = Mock(BindingResult)
+    MethodArgumentNotValidException exception = Mock(MethodArgumentNotValidException)
+
+    when:
+    ResponseEntity<ErrorController.ErrorResponse> errorResponse = errorController.handleMethodArgumentNotValidException(exception)
+
+    then:
+    2 * exception.bindingResult >> bindingResult
+    1 * bindingResult.getFieldErrorCount() >> fieldErrors.size()
+    1 * bindingResult.getFieldErrors() >> fieldErrors
+    0 * _
+
+    errorResponse.statusCode == HttpStatus.BAD_REQUEST
+    errorResponse.body.error == MethodArgumentNotValidException.getSimpleName()
+    errorResponse.body.message == 'name is required; birth_date must be in the past'
+  }
+
+  void 'handle MethodArgumentNotValidException with non-field errors'() {
+
+    given:
+    BindingResult bindingResult = Mock(BindingResult)
+    MethodArgumentNotValidException exception = Mock(MethodArgumentNotValidException)
+
+    when:
+    ResponseEntity<ErrorController.ErrorResponse> errorResponse = errorController.handleMethodArgumentNotValidException(exception)
+
+    then:
+    1 * exception.bindingResult >> bindingResult
+    1 * bindingResult.getFieldErrorCount() >> 0
+    1 * exception.getMessage() >> 'unknown error'
+    1 * exception.getStackTrace() >> []
+    1 * exception.getCause() >> new UnsupportedOperationException()
+    0 * _
+
+    errorResponse.statusCode == HttpStatus.INTERNAL_SERVER_ERROR
+    errorResponse.body.error == 'InternalServerErrorException'
+    errorResponse.body.message == 'An unknown error occurred'
   }
 
   void 'handleUnsupportedRequestException'() {

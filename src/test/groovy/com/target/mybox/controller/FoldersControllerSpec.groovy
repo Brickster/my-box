@@ -2,6 +2,7 @@ package com.target.mybox.controller
 
 import com.target.mybox.domain.Folder
 import com.target.mybox.exception.PageMustNotBeNegativeException
+import com.target.mybox.exception.SizeMustBePositiveException
 import com.target.mybox.service.FoldersService
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -58,6 +59,22 @@ class FoldersControllerSpec extends Specification {
     page | _
     1    | _
     10   | _
+  }
+
+  @Unroll
+  void 'getting folders throws exception when size is not positive using siz=#size'() {
+
+    when:
+    foldersController.getFolders(0, size)
+
+    then:
+    thrown(SizeMustBePositiveException)
+
+    where:
+    size | _
+    0    | _
+    -1   | _
+    -10  | _
   }
 
   void 'getFolder'() {
