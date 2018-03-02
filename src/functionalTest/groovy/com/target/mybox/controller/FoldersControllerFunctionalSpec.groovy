@@ -172,7 +172,7 @@ class FoldersControllerFunctionalSpec extends FunctionalSpec {
     ResponseEntity<List<Map<String, Object>>> response = put("/folders/${folder.id}", updatedFolder)
 
     then:
-    response.statusCode == HttpStatus.RESET_CONTENT
+    response.statusCode == HttpStatus.OK
     response.body.size() == 4
     response.body['id'] == folder.id
     response.body['name'] == updatedFolder.name

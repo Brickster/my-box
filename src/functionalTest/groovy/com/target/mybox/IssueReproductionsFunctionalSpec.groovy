@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
+import spock.lang.Ignore
 
 import java.time.Instant
 
@@ -62,6 +63,7 @@ class IssueReproductionsFunctionalSpec extends FunctionalSpec {
     folderContentPost.statusCode == HttpStatus.CREATED
   }
 
+  @Ignore  // invalidated by #22
   void "issue 6: PUTs don't return 205s"() {
 
     given:
@@ -111,6 +113,21 @@ class IssueReproductionsFunctionalSpec extends FunctionalSpec {
     documentJson['created'] == dateString
     documentJson['last_modified'] == dateString
     folderContentsJson.first()['created'] == dateString
+  }
+
+  void "issue 22: PUTs don't return 200s"() {
+
+    given:
+    foldersRepository.save(new Folder(id: 'f1', name: 'folder'))
+    documentsRepository.save(new Document(id: 'd1', name: 'd1.txt', text: 'd1'))
+
+    when:
+    ResponseEntity<Map<String, Object>> folderPut = put('/folders/f1', new Folder(name: 'folder new'))
+    ResponseEntity<Map<String, Object>> documentPut = put('/documents/d1', new Document(name: 'doc.txt', text: 'text new'))
+
+    then:
+    folderPut.statusCode == HttpStatus.OK
+    documentPut.statusCode == HttpStatus.OK
   }
 
   private DBObject folderDbObject(Folder folder) {

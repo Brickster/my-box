@@ -178,7 +178,7 @@ class DocumentsControllerFunctionalSpec extends FunctionalSpec {
     ResponseEntity<List<Map<String, Object>>> response = put("/documents/${document.id}", updateDocument)
 
     then:
-    response.statusCode == HttpStatus.RESET_CONTENT
+    response.statusCode == HttpStatus.OK
     response.body.size() == 5
     response.body['id'] == document.id
     response.body['name'] == updateDocument.name

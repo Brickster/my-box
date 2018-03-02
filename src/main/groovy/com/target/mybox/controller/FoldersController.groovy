@@ -54,7 +54,7 @@ class FoldersController {
   }
 
   @PutMapping('/{folderId}')
-  @ResponseStatus(HttpStatus.RESET_CONTENT)
+  @ResponseStatus(HttpStatus.OK)
   Folder putFolder(@PathVariable String folderId, @RequestBody @Valid Folder folder) {
     folder.id = folderId
     return foldersService.update(folder)

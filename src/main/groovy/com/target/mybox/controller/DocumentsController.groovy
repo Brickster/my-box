@@ -53,7 +53,7 @@ class DocumentsController {
   }
 
   @PutMapping('/{documentId}')
-  @ResponseStatus(HttpStatus.RESET_CONTENT)
+  @ResponseStatus(HttpStatus.OK)
   Document putDocument(@PathVariable String documentId, @RequestBody @Valid Document document) {
     document.id = documentId
     return documentsService.update(document)
