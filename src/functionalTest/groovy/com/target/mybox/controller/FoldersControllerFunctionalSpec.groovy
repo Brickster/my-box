@@ -9,6 +9,7 @@ import com.target.mybox.repository.FoldersRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import spock.lang.Unroll
 
 class FoldersControllerFunctionalSpec extends FunctionalSpec {
@@ -161,7 +162,7 @@ class FoldersControllerFunctionalSpec extends FunctionalSpec {
     response.body['last_modified'] =~ ISO_FORMAT
   }
 
-  void 'updating a folder updates and return a folder'() {
+  void 'updating a folder updates and returns a folder'() {
 
     given:
     Folder folder = new Folder(id: 'f1', name: 'the folder', created: date1)
@@ -178,6 +179,46 @@ class FoldersControllerFunctionalSpec extends FunctionalSpec {
     response.body['name'] == updatedFolder.name
     response.body['created'] == date1Iso
     response.body['last_modified'] =~ ISO_FORMAT
+
+    foldersRepository.findOne(folder.id).name == updatedFolder.name
+  }
+
+  void 'patching a folder updates and returns a folder'() {
+
+    given:
+    Folder folder = new Folder(id: 'f1', name: 'the folder', created: date1)
+    foldersRepository.save([folder])
+    Map<String, Object> updatedFolder = [name: 'new folder name']
+
+    when:
+    ResponseEntity<List<Map<String, Object>>> response = patch("/folders/${folder.id}", updatedFolder)
+
+    then:
+    response.statusCode == HttpStatus.OK
+    response.body.size() == 4
+    response.body['id'] == folder.id
+    response.body['name'] == updatedFolder['name']
+    response.body['created'] == date1Iso
+    response.body['last_modified'] =~ ISO_FORMAT
+
+    foldersRepository.findOne(folder.id).name == updatedFolder['name']
+  }
+
+  void 'patching a folder returns error when removing required field'() {
+
+    given:
+    Folder folder = new Folder(id: 'f1', name: 'the folder', created: date1)
+    foldersRepository.save([folder])
+    Map<String, Object> updatedFolder = [name: null]
+
+    when:
+    ResponseEntity<List<Map<String, Object>>> response = patch("/folders/${folder.id}", updatedFolder)
+
+    then:
+    response.statusCode == HttpStatus.BAD_REQUEST
+    response.body.size() == 2
+    response.body['error'] == MethodArgumentNotValidException.getSimpleName()
+    response.body['message'] == 'name must not be blank'
   }
 
   void 'deleting a folder deletes a folder'() {

@@ -116,6 +116,21 @@ paths:
             "$ref": "#/definitions/folder"
         <<: *standard-responses
 
+    patch:
+      tags:
+        - Folders
+      summary: "Partially modify a folder"
+      description: "Partially modify a folder"
+      parameters:
+        - "$ref": "#/parameters/folder_id"
+        - "$ref": "#/parameters/folder_patch"
+      responses:
+        205:
+          description: "Updated successfully."
+          schema:
+            "$ref": "#/definitions/folder"
+        <<: *standard-responses
+
     delete:
       tags:
         - Folders
@@ -183,6 +198,21 @@ paths:
       parameters:
         - "$ref": "#/parameters/document_id"
         - "$ref": "#/parameters/document"
+      responses:
+        205:
+          description: "Updated successfully."
+          schema:
+            "$ref": "#/definitions/document"
+        <<: *standard-responses
+
+    patch:
+      tags:
+        - Documents
+      summary: "Partially modify a document"
+      description: "Partially modify a document"
+      parameters:
+        - "$ref": "#/parameters/document_id"
+        - "$ref": "#/parameters/document_patch"
       responses:
         205:
           description: "Updated successfully."
@@ -310,12 +340,17 @@ definitions:
         type: string
         description: Reason for error
 
-  folder:
+  folder_patch:
     type: object
-    properties:
+    properties: &folder_properties
       name:
         type: string
         description: Name of the folder
+
+  folder:
+    type: object
+    properties:
+      <<: *folder_properties
       created:
         type: string
         format: date-time
@@ -335,15 +370,20 @@ definitions:
     items:
       "$ref": "#/definitions/folder"
 
-  document:
+  document_patch:
     type: object
-    properties:
+    properties: &document_properties
       name:
         type: string
         description: Name of the document
       text:
         type: string
         description: Text of the document
+
+  document:
+    type: object
+    properties:
+      <<: *document_properties
       created:
         type: string
         format: date-time
@@ -430,6 +470,13 @@ parameters:
     required: true
     schema:
       "$ref": "#/definitions/folder"
+  folder_patch:
+    name: folder
+    in: body
+    description: "Partial folder object"
+    required: true
+    schema:
+      "$ref": "#/definitions/folder_patch"
   folder_id:
     name: folder_id
     in: path
@@ -444,6 +491,13 @@ parameters:
     required: true
     schema:
       "$ref": "#/definitions/document"
+  document_patch:
+    name: document
+    in: body
+    description: "Partial text document"
+    required: true
+    schema:
+      "$ref": "#/definitions/document_patch"
   document_id:
     name: document_id
     in: path

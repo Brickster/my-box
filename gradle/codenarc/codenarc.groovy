@@ -384,7 +384,7 @@ ruleset {
   UnnecessaryNullCheckBeforeInstanceOf
   UnnecessaryObjectReferences
   UnnecessaryOverridingMethod
-  UnnecessaryPackageReference
+//  UnnecessaryPackageReference  // it's super flaky
   UnnecessaryParenthesesForMethodCallWithClosure
   UnnecessaryPublicModifier
 //  UnnecessaryReturnKeyword

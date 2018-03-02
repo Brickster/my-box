@@ -13,12 +13,15 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
+import javax.validation.ConstraintViolationException
+
 @Slf4j
 @CompileStatic
 @RestController
 @ControllerAdvice
 class ErrorController implements org.springframework.boot.autoconfigure.web.ErrorController {
 
+  public static final String DELIMITER = '; '
   String errorPath = '/error'
 
   @ExceptionHandler([MyBoxException])
@@ -37,7 +40,7 @@ class ErrorController implements org.springframework.boot.autoconfigure.web.Erro
   ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 
     if (e.bindingResult.getFieldErrorCount()) {
-      String message = e.bindingResult.getFieldErrors().collect { "${it.field} ${it.defaultMessage}" }.join('; ')
+      String message = e.bindingResult.getFieldErrors().collect { "${it.field} ${it.defaultMessage}" }.join(DELIMITER)
       ErrorResponse errorResponse = new ErrorResponse(
           error: MethodArgumentNotValidException.getSimpleName(),
           message: message
@@ -51,6 +54,15 @@ class ErrorController implements org.springframework.boot.autoconfigure.web.Erro
   @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   ErrorResponse handleUnsupportedRequestMethod(HttpRequestMethodNotSupportedException e) {
     return new ErrorResponse(error: e.getClass().getSimpleName(), message: 'Method not supported')
+  }
+
+  @ExceptionHandler(ConstraintViolationException)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  ErrorResponse handleConstraintViolationException(ConstraintViolationException e) {
+    return new ErrorResponse(
+        error: e.getClass().getSimpleName(),
+        message: e.constraintViolations.collect { "${it.propertyPath} ${it.message}" }.join(DELIMITER)
+    )
   }
 
   @RequestMapping(value = '/error')

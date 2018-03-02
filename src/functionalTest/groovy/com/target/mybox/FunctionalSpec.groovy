@@ -8,6 +8,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.http.client.ClientHttpResponse
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.client.ResponseErrorHandler
@@ -39,6 +40,7 @@ class FunctionalSpec extends Specification {
   void setup() {
     restTemplate = new RestTemplateBuilder()
         .messageConverters(new MappingJackson2HttpMessageConverter(new CommonConfig().getObjectMapper()))
+        .requestFactory(new HttpComponentsClientHttpRequestFactory())
         .errorHandler(new Only5xxErrorHandler())
         .build()
   }
@@ -78,8 +80,12 @@ class FunctionalSpec extends Specification {
     return post(api, resource)
   }
 
-  ResponseEntity<Map<String, Object>> put(String api, Object resource = null) {
-    return restTemplate.exchange(uri(api), HttpMethod.PUT, new HttpEntity<Object>(resource), Map)
+  public <T> ResponseEntity<Map<String, Object>> put(String api, T resource = null) {
+    return restTemplate.exchange(uri(api), HttpMethod.PUT, new HttpEntity<T>(resource), Map)
+  }
+
+  ResponseEntity<Map<String, Object>> patch(String api, Map resource = null) {
+    return restTemplate.exchange(uri(api), HttpMethod.PATCH, new HttpEntity<Map>(resource), Map)
   }
 
   ResponseEntity<Map<String, Object>> delete(String api) {

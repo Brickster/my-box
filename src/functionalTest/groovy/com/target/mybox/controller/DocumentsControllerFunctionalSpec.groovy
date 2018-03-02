@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Unroll
 
+import javax.validation.ConstraintViolationException
+
 class DocumentsControllerFunctionalSpec extends FunctionalSpec {
 
   @Autowired
@@ -167,7 +169,7 @@ class DocumentsControllerFunctionalSpec extends FunctionalSpec {
     response.body['last_modified'] =~ ISO_FORMAT
   }
 
-  void 'updating a document updates and return a document'() {
+  void 'updating a document updates and returns a document'() {
 
     given:
     Document document = new Document(id: 'd1', name: 'document.txt', text: 'the text', created: date1)
@@ -185,6 +187,49 @@ class DocumentsControllerFunctionalSpec extends FunctionalSpec {
     response.body['text'] == updateDocument.text
     response.body['created'] == date1Iso
     response.body['last_modified'] =~ ISO_FORMAT
+
+    Document repoDocument = documentsRepository.findOne(document.id)
+    repoDocument.name == updateDocument.name
+    repoDocument.text == updateDocument.text
+  }
+
+  void 'patching a document updates and returns a document'() {
+
+    given:
+    Document document = new Document(id: 'd1', name: 'document.txt', text: 'the text', created: date1)
+    documentsRepository.save([document])
+    Map<String, String> documentUpdate = [text: 'the new text']
+
+    when:
+    ResponseEntity<List<Map<String, Object>>> response = patch("/documents/${document.id}", documentUpdate)
+
+    then:
+    response.statusCode == HttpStatus.OK
+    response.body.size() == 5
+    response.body['id'] == document.id
+    response.body['name'] == document.name
+    response.body['text'] == documentUpdate['text']
+    response.body['created'] == date1Iso
+    response.body['last_modified'] =~ ISO_FORMAT
+
+    documentsRepository.findOne(document.id).text == documentUpdate['text']
+  }
+
+  void 'patching a document returns error when removing required field'() {
+
+    given:
+    Document document = new Document(id: 'd1', name: 'document.txt', text: 'the text', created: date1)
+    documentsRepository.save([document])
+    Map<String, String> documentUpdate = [text: null]
+
+    when:
+    ResponseEntity<List<Map<String, Object>>> response = patch("/documents/${document.id}", documentUpdate)
+
+    then:
+    response.statusCode == HttpStatus.BAD_REQUEST
+    response.body.size() == 2
+    response.body['error'] == ConstraintViolationException.getSimpleName()
+    response.body['message'] == 'text must not be blank'
   }
 
   void 'deleting a document deletes a document'() {

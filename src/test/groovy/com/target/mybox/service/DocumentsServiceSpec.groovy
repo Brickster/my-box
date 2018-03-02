@@ -3,6 +3,7 @@ package com.target.mybox.service
 import com.target.mybox.domain.Document
 import com.target.mybox.exception.DocumentNotFoundException
 import com.target.mybox.repository.DocumentsRepository
+import org.hibernate.validator.internal.engine.path.PathImpl
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -10,13 +11,17 @@ import org.springframework.data.domain.Pageable
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import javax.validation.ConstraintViolation
+import javax.validation.ConstraintViolationException
+import javax.validation.Validator
 import java.time.Instant
 
 class DocumentsServiceSpec extends Specification {
 
   DocumentsService documentsService = new DocumentsService(
       documentsRepository: Mock(DocumentsRepository),
-      folderContentsService: Mock(FolderContentsService)
+      folderContentsService: Mock(FolderContentsService),
+      validator: Mock(Validator)
   )
 
   String documentId = 'd1'
@@ -80,7 +85,7 @@ class DocumentsServiceSpec extends Specification {
     actual.is(saved)
   }
 
-  void 'update'() {
+  void 'update document'() {
 
     given:
     Document document = new Document(id: documentId)
@@ -111,6 +116,53 @@ class DocumentsServiceSpec extends Specification {
     0 * _
 
     thrown(DocumentNotFoundException)
+  }
+
+  void 'partial update only partially updates document'() {
+
+    given:
+    Map<String, String> documentUpdate = ['text': 'new text']
+    Instant now = Instant.now()
+    Document existingDocument = new Document(id: '1', name: 'text.txt', text: 'text', created: now, lastModified: now)
+    Document savedDocument = new Document()
+
+    when:
+    Document updatedDocument = documentsService.update(documentId, documentUpdate)
+
+    then:
+    1 * documentsService.documentsRepository.findOne(documentId) >> existingDocument
+    1 * documentsService.validator.validate(existingDocument) >> []
+    1 * documentsService.documentsRepository.save({ Document it ->
+      it.id == '1' &&
+          it.name == 'text.txt' &&
+          it.text == documentUpdate['text'] &&
+          it.created == now &&
+          it.lastModified == now
+    }) >> savedDocument
+    0 * _
+
+    updatedDocument.is(savedDocument)
+  }
+
+  void 'partial update with invalid update throws exception'() {
+
+    given:
+    Map<String, String> documentUpdate = ['text': 'new text', name: null]
+    Document existingDocument = new Document()
+    Set<ConstraintViolation> violations = [Mock(ConstraintViolation)] as Set
+
+    when:
+    documentsService.update(documentId, documentUpdate)
+
+    then:
+    1 * documentsService.documentsRepository.findOne(documentId) >> existingDocument
+    1 * documentsService.validator.validate(existingDocument) >> violations
+    1 * violations[0].propertyPath >> PathImpl.createPathFromString('name')
+    1 * violations[0].message >> 'bad name'
+    0 * _
+
+    ConstraintViolationException exception = thrown(ConstraintViolationException)
+    exception.constraintViolations == violations
   }
 
   // this confirms that a bug exists. DO NOT FIX.

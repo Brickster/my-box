@@ -8,6 +8,11 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
+import javax.validation.ConstraintViolation
+import javax.validation.ConstraintViolationException
+import javax.validation.Validation
+import javax.validation.Validator
+
 //@CompileStatic
 @Service
 class DocumentsService {
@@ -17,6 +22,8 @@ class DocumentsService {
 
   @Autowired
   FolderContentsService folderContentsService
+
+  Validator validator = Validation.buildDefaultValidatorFactory().getValidator()
 
   Page<Document> getAll(Pageable pageable) {
     return documentsRepository.findAll(pageable)
@@ -40,6 +47,26 @@ class DocumentsService {
       throw new DocumentNotFoundException()
     }
     document.created = existingDocument.created
+    return documentsRepository.save(document)
+  }
+
+  Document update(String documentId, Map<String, String> documentUpdate) {
+    Document document = documentsRepository.findOne(documentId)
+    if (!document) {
+      throw new DocumentNotFoundException()
+    }
+
+    if (documentUpdate.containsKey(Document.NAME)) {
+      document.name = documentUpdate[Document.NAME]
+    }
+    if (documentUpdate.containsKey(Document.TEXT)) {
+      document.text = documentUpdate[Document.TEXT]
+    }
+
+    Set<ConstraintViolation<Document>> violations = validator.validate(document)
+    if (violations) {
+      throw new ConstraintViolationException(violations)
+    }
     return documentsRepository.save(document)
   }
 

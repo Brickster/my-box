@@ -116,6 +116,22 @@ class DocumentsControllerSpec extends Specification {
     actual.is(savedDocument)
   }
 
+  void 'patch document'() {
+
+    given:
+    Map<String, String> documentUpdate = [:]
+    Document expected = new Document()
+
+    when:
+    Document patchedDocument = documentsController.patchDocument(documentId, documentUpdate)
+
+    then:
+    1 * documentsController.documentsService.update(documentId, documentUpdate) >> expected
+    0 * _
+
+    patchedDocument.is(expected)
+  }
+
   void 'deleteDocument'() {
 
     when:

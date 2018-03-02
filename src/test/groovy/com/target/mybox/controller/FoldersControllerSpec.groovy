@@ -124,6 +124,22 @@ class FoldersControllerSpec extends Specification {
     actual.is(savedFolder)
   }
 
+  void 'patch folder'() {
+
+    given:
+    Folder folder = new Folder()
+    Folder savedFolder = new Folder()
+
+    when:
+    Folder actual = foldersController.patchFolder(folderId, folder)
+
+    then:
+    1 * foldersController.foldersService.update({ it.id == folderId }) >> savedFolder
+    0 * _
+
+    actual.is(savedFolder)
+  }
+
   void 'deleteFolder'() {
 
     when:

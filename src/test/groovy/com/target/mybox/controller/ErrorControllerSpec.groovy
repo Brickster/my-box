@@ -1,6 +1,7 @@
 package com.target.mybox.controller
 
 import com.target.mybox.exception.MyBoxException
+import org.hibernate.validator.internal.engine.path.PathImpl
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
@@ -10,6 +11,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ResponseStatus
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import javax.validation.ConstraintViolation
+import javax.validation.ConstraintViolationException
 
 class ErrorControllerSpec extends Specification {
 
@@ -92,6 +96,28 @@ class ErrorControllerSpec extends Specification {
     then:
     errorResponse.error == HttpRequestMethodNotSupportedException.getSimpleName()
     errorResponse.message == 'Method not supported'
+  }
+
+  void 'handle ConstraintViolationException'() {
+
+    given:
+    ConstraintViolation<String> violation1 = Mock(ConstraintViolation)
+    ConstraintViolation<String> violation2 = Mock(ConstraintViolation)
+    ConstraintViolationException exception = new ConstraintViolationException([violation1, violation2] as Set)
+
+    when:
+    ErrorController.ErrorResponse errorResponse = errorController.handleConstraintViolationException(exception)
+
+    then:
+    1 * violation1.propertyPath >> PathImpl.createPathFromString('p1')
+    1 * violation1.message >> 'must not be blank'
+    1 * violation2.propertyPath >> PathImpl.createPathFromString('p2')
+    1 * violation2.message >> 'must be positive'
+    0 * _
+
+    errorResponse.error == ConstraintViolationException.getSimpleName()
+    errorResponse.message == 'p1 must not be blank; p2 must be positive' ||
+        errorResponse.message == 'p2 must be positive; p1 must not be blank'
   }
 
   void 'handleUnknownException'() {

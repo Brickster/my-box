@@ -11,6 +11,10 @@ import java.time.Instant
 @CompileStatic
 @org.springframework.data.mongodb.core.mapping.Document(collection = 'documents')
 class Document {
+
+  public static final String NAME = 'name'
+  public static final String TEXT = 'text'
+
   String id
   @NotBlank
   String name
