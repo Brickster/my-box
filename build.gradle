@@ -47,9 +47,6 @@ dependencies {
   // jackson support for Java 8 date & time API
   compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.1"
 
-  // adds PATCH support
-  compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'
-
   // validation
   compile 'javax.validation:validation-api:2.0.1.Final'
   compile 'org.hibernate:hibernate-validator:6.0.7.Final'
@@ -60,6 +57,7 @@ dependencies {
   testCompile 'org.spockframework:spock-spring:1.0-groovy-2.4'
   testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.2.RELEASE'
   testCompile 'cglib:cglib-nodep:3.2.4'
+  testCompile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'  // adds PATCH support
 }
 
 sourceSets {
