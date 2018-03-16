@@ -1,10 +1,9 @@
 package com.target.mybox.controller
 
 import com.target.mybox.domain.Folder
-import com.target.mybox.exception.PageMustNotBeNegativeException
-import com.target.mybox.exception.SizeMustBePositiveException
 import com.target.mybox.service.FoldersService
 import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -22,59 +21,16 @@ class FoldersControllerSpec extends Specification {
 
     given:
     List<Folder> expected = [new Folder()]
+    Pageable pageable = new PageRequest(0, 10)
 
     when:
-    List<Folder> actual = foldersController.getFolders(page, 5)
+    List<Folder> actual = foldersController.getFolders(pageable)
 
     then:
-    1 * foldersController.foldersService.getAll({ Pageable pageable ->
-      pageable.pageNumber == 0 && pageable.pageSize == 5
-    }) >> new PageImpl<>(expected)
+    1 * foldersController.foldersService.getAll(pageable) >> new PageImpl<>(expected)
     0 * _
 
     actual == expected
-
-    where:
-    page | _
-    0    | _
-    -1   | _
-    -10  | _
-  }
-
-  // this confirms that a bug exists. DO NOT FIX.
-  @Unroll
-  void 'getFolders throws exception when page is positive: #page'() {
-
-    given:
-
-    when:
-    foldersController.getFolders(page, 10)
-
-    then:
-    0 * _
-
-    thrown(PageMustNotBeNegativeException)
-
-    where:
-    page | _
-    1    | _
-    10   | _
-  }
-
-  @Unroll
-  void 'getting folders throws exception when size is not positive using siz=#size'() {
-
-    when:
-    foldersController.getFolders(0, size)
-
-    then:
-    thrown(SizeMustBePositiveException)
-
-    where:
-    size | _
-    0    | _
-    -1   | _
-    -10  | _
   }
 
   void 'getFolder'() {

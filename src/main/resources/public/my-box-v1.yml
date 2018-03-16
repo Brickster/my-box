@@ -61,8 +61,9 @@ paths:
       summary: "Get folders"
       description: "Get folders"
       parameters:
-        - "$ref": "#/parameters/page"
-        - "$ref": "#/parameters/per_page"
+        - $ref: "#/parameters/page"
+        - $ref: "#/parameters/per_page"
+        - $ref: "#/parameters/sort"
       responses:
         200:
           description: "Returned successfully."
@@ -150,8 +151,9 @@ paths:
       summary: "Get documents"
       description: "Get documents"
       parameters:
-        - "$ref": "#/parameters/page"
-        - "$ref": "#/parameters/per_page"
+        - $ref: "#/parameters/page"
+        - $ref: "#/parameters/per_page"
+        - $ref: "#/parameters/sort"
       responses:
         200:
           description: "Returned successfully."
@@ -239,9 +241,10 @@ paths:
       summary: "Get the contents of a folder"
       description: "Get the contents of a folder"
       parameters:
-        - "$ref": "#/parameters/folder_id"
-        - "$ref": "#/parameters/page"
-        - "$ref": "#/parameters/per_page"
+        - $ref: "#/parameters/folder_id"
+        - $ref: "#/parameters/page"
+        - $ref: "#/parameters/per_page"
+        - $ref: "#/parameters/sort"
       responses:
         200:
           description: "Returned successfully."
@@ -462,6 +465,12 @@ parameters:
     required: false
     type: integer
     default: 5
+  sort:
+    name: sort
+    in: query
+    description: 'Sort option in format field:order (example: name:asc or text:desc)'
+    required: false
+    type: string
 
   folder:
     name: folder

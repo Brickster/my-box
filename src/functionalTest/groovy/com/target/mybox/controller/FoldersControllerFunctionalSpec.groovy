@@ -5,12 +5,15 @@ import com.target.mybox.domain.Folder
 import com.target.mybox.exception.FolderNotFoundException
 import com.target.mybox.exception.PageMustNotBeNegativeException
 import com.target.mybox.exception.SizeMustBePositiveException
+import com.target.mybox.exception.SortFormatException
 import com.target.mybox.repository.FoldersRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import spock.lang.Unroll
+
+import java.time.Instant
 
 class FoldersControllerFunctionalSpec extends FunctionalSpec {
 
@@ -125,6 +128,57 @@ class FoldersControllerFunctionalSpec extends FunctionalSpec {
     -1   | _
     -2   | _
     -10  | _
+  }
+
+  @Unroll
+  void 'get folders sorted #description'() {
+
+    given:
+    Folder folder = new Folder(id: 'f1', name: 'zz folder', created: date1)
+    Folder folder2 = new Folder(id: 'f2', name: 'aa folder', created: Instant.now())
+    Folder folder3 = new Folder(id: 'f3', name: 'Za folder', created: date2)
+    foldersRepository.save([folder, folder2, folder3])
+
+    when:
+    ResponseEntity<List<Map<String, Object>>> response = getList('/folders', queryParmeters)
+
+    then:
+    (response.body as List<Map<String, Object>>)*.get('id') == expertedOrder
+
+    where:
+    field           | direction            | expertedOrder      | description
+    'name'          | Direction.ASCENDING  | ['f3', 'f2', 'f1'] | 'ascending by name'
+    'name'          | Direction.DESCENDING | ['f1', 'f2', 'f3'] | 'descending by name'
+    'created'       | Direction.ASCENDING  | ['f1', 'f3', 'f2'] | 'ascending by created'
+    'created'       | Direction.DESCENDING | ['f2', 'f3', 'f1'] | 'descending by created'
+    'last_modified' | Direction.ASCENDING  | ['f1', 'f2', 'f3'] | 'ascending by last_modified'
+    'last_modified' | Direction.DESCENDING | ['f3', 'f2', 'f1'] | 'descending by last_modified'
+    'blarg'         | Direction.DESCENDING | ['f1', 'f2', 'f3'] | 'by insertion order'
+    null            | null                 | ['f3', 'f2', 'f1'] | 'using default'
+
+    queryParmeters = field ? ['sort': direction.toQueryParameter(field)] : null
+  }
+
+  @Unroll
+  void 'getting folders with bad sort format #badSort will return an error'() {
+
+    when:
+    ResponseEntity<Map<String, Object>> response = get('/folders', ['sort': badSort])
+
+    then:
+    then:
+    response.statusCode == HttpStatus.BAD_REQUEST
+    response.body.size() == 2
+    response.body['error'] == SortFormatException.getSimpleName()
+    response.body['message'] == /sort must have format \d+:(asc|desc)/
+
+    where:
+    badSort          | _
+    'name'           | _
+    'name:a'         | _
+    'name:ascending' | _
+    'name(asc)'      | _
+    '+name'          | _
   }
 
   void 'getting a folder returns a folder'() {

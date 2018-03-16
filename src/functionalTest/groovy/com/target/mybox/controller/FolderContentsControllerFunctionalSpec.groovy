@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Unroll
 
+import java.time.Instant
+
 class FolderContentsControllerFunctionalSpec extends FunctionalSpec {
 
   @Autowired
@@ -88,6 +90,33 @@ class FolderContentsControllerFunctionalSpec extends FunctionalSpec {
     1    | 4    | ['d5', 'd6']
     2    | 4    | []
     100  | 4    | []
+  }
+
+  @Unroll
+  void 'get folder contents sorted #description'() {
+
+    given:
+    Folder folder = foldersRepository.save(new Folder(name: 'docs'))
+    FolderContent folderContent = new FolderContent(id: 'fc1', folderId: folder.id, documentId: 'd1', created: date1)
+    FolderContent folderContent2 = new FolderContent(id: 'fc2', folderId: folder.id, documentId: 'd2', created: Instant.now())
+    FolderContent folderContent3 = new FolderContent(id: 'fc3', folderId: folder.id, documentId: 'd3', created: date2)
+    FolderContent folderContent4 = new FolderContent(id: 'fc4', folderId: 'other folder', documentId: 'd4', created: date1)
+    folderContentsRepository.save([folderContent, folderContent2, folderContent3, folderContent4])
+
+    when:
+    ResponseEntity<List<Map<String, Object>>> response = getList("/folders/${folder.id}/contents", queryParameters)
+
+    then:
+    (response.body as List<Map<String, Object>>)*.get('document_id') == expertedOrder
+
+    where:
+    field     | direction            | expertedOrder      | description
+    'created' | Direction.ASCENDING  | ['d1', 'd3', 'd2'] | 'ascending by created'
+    'created' | Direction.DESCENDING | ['d2', 'd3', 'd1'] | 'descending by created'
+    'blarg'   | Direction.ASCENDING  | ['d1', 'd2', 'd3'] | 'by insertion order'
+    null      | null                 | ['d1', 'd3', 'd2'] | 'using default'
+
+    queryParameters = field ? ['sort': direction.toQueryParameter(field)] : null
   }
 
   @Unroll

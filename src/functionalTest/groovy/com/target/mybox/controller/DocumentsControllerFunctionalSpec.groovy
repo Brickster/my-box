@@ -5,6 +5,7 @@ import com.target.mybox.domain.Document
 import com.target.mybox.domain.FolderContent
 import com.target.mybox.exception.PageMustNotBeNegativeException
 import com.target.mybox.exception.SizeMustBePositiveException
+import com.target.mybox.exception.SortFormatException
 import com.target.mybox.repository.DocumentsRepository
 import com.target.mybox.repository.FolderContentsRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity
 import spock.lang.Unroll
 
 import javax.validation.ConstraintViolationException
+import java.time.Instant
 
 class DocumentsControllerFunctionalSpec extends FunctionalSpec {
 
@@ -130,6 +132,58 @@ class DocumentsControllerFunctionalSpec extends FunctionalSpec {
     -1   | _
     -2   | _
     -10  | _
+  }
+
+  @Unroll
+  void 'get documents sorted #description'() {
+
+    given:
+    Document document = new Document(id: 'd1', name: 'zz document.txt', text: 'the text 2', created: date1)
+    Document document2 = new Document(id: 'd2', name: 'aa document.txt', text: 'the text 2', created: Instant.now())
+    Document document3 = new Document(id: 'd3', name: 'Za document.txt', text: 'the text 1', created: date2)
+    documentsRepository.save([document, document2, document3])
+
+    when:
+    ResponseEntity<List<Map<String, Object>>> response = getList('/documents', queryParameters)
+
+    then:
+    (response.body as List<Map<String, Object>>)*.get('id') == expertedOrder
+
+    where:
+    field           | direction            | expertedOrder      | description
+    'name'          | Direction.ASCENDING  | ['d3', 'd2', 'd1'] | 'ascending by name'
+    'name'          | Direction.DESCENDING | ['d1', 'd2', 'd3'] | 'descending by name'
+    'text'          | Direction.ASCENDING  | ['d3', 'd1', 'd2'] | 'ascending by text'
+    'created'       | Direction.ASCENDING  | ['d1', 'd3', 'd2'] | 'ascending by created'
+    'created'       | Direction.DESCENDING | ['d2', 'd3', 'd1'] | 'descending by created'
+    'last_modified' | Direction.ASCENDING  | ['d1', 'd2', 'd3'] | 'ascending by last_modified'
+    'last_modified' | Direction.DESCENDING | ['d3', 'd2', 'd1'] | 'descending by last_modified'
+    'blarg'         | Direction.ASCENDING  | ['d1', 'd2', 'd3'] | 'by insertion order'
+    null            | null                 | ['d3', 'd2', 'd1'] | 'using default'
+
+    queryParameters = field ? ['sort': direction.toQueryParameter(field)] : null
+  }
+
+  @Unroll
+  void 'getting documents with bad sort format #badSort will return an error'() {
+
+    when:
+    ResponseEntity<Map<String, Object>> response = get('/documents', ['sort': badSort])
+
+    then:
+    then:
+    response.statusCode == HttpStatus.BAD_REQUEST
+    response.body.size() == 2
+    response.body['error'] == SortFormatException.getSimpleName()
+    response.body['message'] == /sort must have format \d+:(asc|desc)/
+
+    where:
+    badSort          | _
+    'name'           | _
+    'name:a'         | _
+    'name:ascending' | _
+    'name(asc)'      | _
+    '+name'          | _
   }
 
   void 'getting a document returns a document'() {

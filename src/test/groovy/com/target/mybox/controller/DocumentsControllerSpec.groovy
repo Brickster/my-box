@@ -1,13 +1,11 @@
 package com.target.mybox.controller
 
 import com.target.mybox.domain.Document
-import com.target.mybox.exception.PageMustNotBeNegativeException
-import com.target.mybox.exception.SizeMustBePositiveException
 import com.target.mybox.service.DocumentsService
 import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import spock.lang.Specification
-import spock.lang.Unroll
 
 class DocumentsControllerSpec extends Specification {
 
@@ -21,52 +19,16 @@ class DocumentsControllerSpec extends Specification {
 
     given:
     List<Document> expected = [new Document()]
+    Pageable pageable = new PageRequest(0, 10)
 
     when:
-    List<Document> actual = documentsController.getDocuments(1, 10)
+    List<Document> actual = documentsController.getDocuments(pageable)
 
     then:
-    1 * documentsController.documentsService.getAll({ Pageable pageable ->
-      pageable.pageNumber == 1 && pageable.pageSize == 10
-    }) >> new PageImpl<>(expected)
+    1 * documentsController.documentsService.getAll(pageable) >> new PageImpl<>(expected)
     0 * _
 
     actual == expected
-  }
-
-  @Unroll
-  void 'getDocuments throws exception when page is not greater than zero'() {
-
-    when:
-    documentsController.getDocuments(page, 10)
-
-    then:
-    0 * _
-    thrown(PageMustNotBeNegativeException)
-
-    where:
-    page | _
-    -1   | _
-    -2   | _
-    -10  | _
-  }
-
-  @Unroll
-  void 'getDocuments throws exception when size is not positive'() {
-
-    when:
-    documentsController.getDocuments(0, size)
-
-    then:
-    0 * _
-    thrown(SizeMustBePositiveException)
-
-    where:
-    size | _
-    0    | _
-    -1   | _
-    -2   | _
-    -10  | _
   }
 
   void 'getDocument'() {

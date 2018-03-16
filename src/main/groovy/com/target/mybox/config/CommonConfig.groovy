@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.config.EnableMongoAuditing
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
@@ -31,5 +32,10 @@ class CommonConfig extends WebMvcConfigurerAdapter {
   @Override
   void addCorsMappings(CorsRegistry registry) {
     registry.addMapping('/**').allowedOrigins(swaggerUiUrl)
+  }
+
+  @Override
+  void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+    argumentResolvers.add(new PageableResolver(new SortResolver()))
   }
 }

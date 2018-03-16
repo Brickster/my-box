@@ -92,6 +92,21 @@ class FunctionalSpec extends Specification {
     return restTemplate.exchange(uri(api), HttpMethod.DELETE, null, Map)
   }
 
+  static enum Direction {
+    ASCENDING('asc'),
+    DESCENDING('desc')
+
+    final String value
+
+    Direction(String value) {
+      this.value = value
+    }
+
+    String toQueryParameter(String field) {
+      return "$field:$value"
+    }
+  }
+
   private static class Only5xxErrorHandler implements ResponseErrorHandler {
 
     @Override
