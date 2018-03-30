@@ -20,6 +20,9 @@ class CommonConfig extends WebMvcConfigurerAdapter {
   @Value('${swagger-ui.url}')
   String swaggerUiUrl
 
+  @Value('${faulty}')
+  boolean faulty
+
   @Bean
   ObjectMapper getObjectMapper() {
     ObjectMapper objectMapper = new ObjectMapper()
@@ -36,6 +39,6 @@ class CommonConfig extends WebMvcConfigurerAdapter {
 
   @Override
   void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-    argumentResolvers.add(new PageableResolver(new SortResolver()))
+    argumentResolvers.add(new PageableResolver(new SortResolver(), faulty))
   }
 }

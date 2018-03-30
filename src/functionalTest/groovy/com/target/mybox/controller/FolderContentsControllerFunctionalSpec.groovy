@@ -4,6 +4,7 @@ import com.target.mybox.FunctionalSpec
 import com.target.mybox.domain.Document
 import com.target.mybox.domain.Folder
 import com.target.mybox.domain.FolderContent
+import com.target.mybox.exception.FolderAlreadyContainsDocumentException
 import com.target.mybox.exception.PageMustNotBeNegativeException
 import com.target.mybox.exception.SizeMustBePositiveException
 import com.target.mybox.repository.DocumentsRepository
@@ -173,6 +174,16 @@ class FolderContentsControllerFunctionalSpec extends FunctionalSpec {
     response.body['document_id'] == 'd1'
     response.body['created'] =~ ISO_FORMAT
     folderContentsRepository.count() == 1
+
+    when: 'putting again'
+    response = post('/folders/f1/contents/d1')
+
+    then: 'an error is returned and the document is not added'
+    response.statusCode == HttpStatus.FORBIDDEN
+    response.body.size() == 2
+    response.body['error'] == FolderAlreadyContainsDocumentException.getSimpleName()
+    response.body['message'] == 'Folder already contains document'
+    folderContentsRepository.count() == 1
   }
 
   void 'removing a document from a folder removes the document from the folder'() {
@@ -185,7 +196,7 @@ class FolderContentsControllerFunctionalSpec extends FunctionalSpec {
     ResponseEntity<Map<String, Object>> response = delete('/folders/f1/contents/d1')
 
     then:
-    response.statusCode == HttpStatus.GONE
+    response.statusCode == HttpStatus.NO_CONTENT
     !response.body
     folderContentsRepository.count() == 0
   }

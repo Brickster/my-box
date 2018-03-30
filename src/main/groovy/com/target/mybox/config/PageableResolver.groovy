@@ -14,8 +14,11 @@ import java.lang.reflect.Method
 
 class PageableResolver extends PageableHandlerMethodArgumentResolver {
 
-  PageableResolver(SortArgumentResolver sortArgumentResolver) {
+  final boolean faulty
+
+  PageableResolver(SortArgumentResolver sortArgumentResolver, boolean faulty = false) {
     super(sortArgumentResolver)
+    this.faulty = faulty
   }
 
   @Override
@@ -29,7 +32,7 @@ class PageableResolver extends PageableHandlerMethodArgumentResolver {
     Method method = methodParameter.getMethod()
     String methodName = method.name
     Closure<Boolean> pageValidator = { it >= 0 }
-    if (methodName == 'getFolders') {
+    if (faulty && methodName == 'getFolders') {
       pageValidator = { it <= 0 }  // NOTE: intentionally error on numbers greater than 0 rather than less than
     }
 

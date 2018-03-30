@@ -84,16 +84,12 @@ class FoldersControllerFunctionalSpec extends FunctionalSpec {
     null | 100  | ['f1', 'f2', 'f3', 'f4', 'f5', 'f6']
     null | 4    | ['f1', 'f2', 'f3', 'f4']
     0    | 4    | ['f1', 'f2', 'f3', 'f4']
-
-    // negative cases that confirm a bug
-    -1   | 5    | ['f1', 'f2', 'f3', 'f4', 'f5']
-    -2   | 5    | ['f1', 'f2', 'f3', 'f4', 'f5']
-    -10  | 5    | ['f1', 'f2', 'f3', 'f4', 'f5']
+    1    | 4    | ['f5', 'f6']
+    2    | 4    | []
   }
 
-  // this confirms that a bug exists. DO NOT FIX.
   @Unroll
-  void 'getting folders with positive page returns error with page=#page'() {
+  void 'getting folders with negative page returns error with page=#page'() {
 
     when:
     ResponseEntity<Map<String, Object>> response = getError('/folders', ['page': page])
@@ -106,9 +102,9 @@ class FoldersControllerFunctionalSpec extends FunctionalSpec {
 
     where:
     page | _
-    1    | _
-    2    | _
-    100  | _
+    -1   | _
+    -2   | _
+    -100 | _
   }
 
   @Unroll
@@ -285,7 +281,7 @@ class FoldersControllerFunctionalSpec extends FunctionalSpec {
     ResponseEntity<Map<String, Object>> response = delete("/folders/${folder.id}")
 
     then: 'the folder is deleted'
-    response.statusCode == HttpStatus.GONE
+    response.statusCode == HttpStatus.NO_CONTENT
     !response.body
 
     when: 'the folder is retrieved'
@@ -300,7 +296,7 @@ class FoldersControllerFunctionalSpec extends FunctionalSpec {
     response = delete("/folders/${folder.id}")
 
     then: 'the document is still gone'
-    response.statusCode == HttpStatus.GONE
+    response.statusCode == HttpStatus.NO_CONTENT
     !response.body
   }
 }

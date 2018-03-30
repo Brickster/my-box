@@ -101,8 +101,7 @@ class FolderContentsServiceSpec extends Specification {
     thrown(DocumentNotFoundException)
   }
 
-  // this confirms that a bug exists. DO NOT FIX.
-  void 'create throws exception when document is already in the folder but adds it anyway'() {
+  void 'create throws exception when document is already in the folder'() {
 
     given:
     FolderContent folderContent = new FolderContent(folderId: folderId, documentId: documentId)
@@ -114,7 +113,6 @@ class FolderContentsServiceSpec extends Specification {
     1 * folderContentsService.foldersService.exists(folderId) >> true
     1 * folderContentsService.documentsService.exists(documentId) >> true
     1 * folderContentsService.folderContentsRepository.existsByFolderIdAndDocumentId(folderId, documentId) >> true
-    1 * folderContentsService.folderContentsRepository.save(folderContent)
     0 * _
 
     thrown(FolderAlreadyContainsDocumentException)

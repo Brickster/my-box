@@ -6,6 +6,7 @@ import com.target.mybox.exception.FolderAlreadyContainsDocumentException
 import com.target.mybox.exception.FolderNotFoundException
 import com.target.mybox.repository.FolderContentsRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -13,6 +14,9 @@ import org.springframework.stereotype.Service
 //@CompileStatic
 @Service
 class FolderContentsService {
+
+  @Value('${faulty}')
+  boolean faulty
 
   @Autowired
   FolderContentsRepository folderContentsRepository
@@ -34,15 +38,18 @@ class FolderContentsService {
       throw new DocumentNotFoundException()
     }
 
-    // NOTE: intentionally checked if the folder contains the document, add it anyway, then error out
     boolean folderContainsDocument = folderContentsRepository.existsByFolderIdAndDocumentId(
         folderContent.folderId,
         folderContent.documentId
     )
-    FolderContent createdFolderContent = folderContentsRepository.save(folderContent)
     if (folderContainsDocument) {
+      if (faulty) {
+        // NOTE: intentionally checked if the folder contains the document, add it anyway, then error out
+        folderContentsRepository.save(folderContent)
+      }
       throw new FolderAlreadyContainsDocumentException()
     }
+    FolderContent createdFolderContent = folderContentsRepository.save(folderContent)
     return createdFolderContent
   }
 

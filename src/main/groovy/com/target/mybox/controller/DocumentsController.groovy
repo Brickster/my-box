@@ -4,10 +4,12 @@ import com.target.mybox.domain.Document
 import com.target.mybox.service.DocumentsService
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -25,6 +27,9 @@ import javax.validation.Valid
 @RestController
 @RequestMapping('/documents')
 class DocumentsController {
+
+  @Value('${faulty}')
+  boolean faulty
 
   @Autowired
   DocumentsService documentsService
@@ -61,8 +66,8 @@ class DocumentsController {
   }
 
   @DeleteMapping('/{documentId}')
-  @ResponseStatus(HttpStatus.GONE)
-  void deleteDocument(@PathVariable String documentId) {
+  ResponseEntity<Void> deleteDocument(@PathVariable String documentId) {
     documentsService.delete(documentId)
+    new ResponseEntity<Void>(faulty ? HttpStatus.GONE : HttpStatus.NO_CONTENT)
   }
 }

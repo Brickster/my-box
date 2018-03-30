@@ -5,6 +5,8 @@ import com.target.mybox.service.DocumentsService
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 
 class DocumentsControllerSpec extends Specification {
@@ -97,10 +99,13 @@ class DocumentsControllerSpec extends Specification {
   void 'deleteDocument'() {
 
     when:
-    documentsController.deleteDocument(documentId)
+    ResponseEntity<Void> response = documentsController.deleteDocument(documentId)
 
     then:
     1 * documentsController.documentsService.delete(documentId)
     0 * _
+
+    response.statusCode == HttpStatus.NO_CONTENT
+    !response.body
   }
 }

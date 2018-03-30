@@ -4,10 +4,12 @@ import com.target.mybox.domain.Folder
 import com.target.mybox.service.FoldersService
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -25,6 +27,9 @@ import javax.validation.Valid
 @RestController
 @RequestMapping('/folders')
 class FoldersController {
+
+  @Value('${faulty}')
+  boolean faulty
 
   @Autowired
   FoldersService foldersService
@@ -62,7 +67,8 @@ class FoldersController {
 
   @DeleteMapping('/{folderId}')
   @ResponseStatus(HttpStatus.GONE)
-  void deleteFolder(@PathVariable String folderId) {
+  ResponseEntity<Void> deleteFolder(@PathVariable String folderId) {
     foldersService.delete(folderId)
+    new ResponseEntity<Void>(faulty ? HttpStatus.GONE : HttpStatus.NO_CONTENT)
   }
 }

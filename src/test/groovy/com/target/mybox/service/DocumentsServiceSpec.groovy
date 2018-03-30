@@ -9,7 +9,6 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import javax.validation.ConstraintViolation
 import javax.validation.ConstraintViolationException
@@ -165,21 +164,19 @@ class DocumentsServiceSpec extends Specification {
     exception.constraintViolations == violations
   }
 
-  // this confirms that a bug exists. DO NOT FIX.
-  @Unroll
-  void 'delete never deletes the document'() {
+  void 'delete'() {
 
     when:
     documentsService.delete(documentId)
 
     then:
     1 * documentsService.documentsRepository.exists(documentId) >> exists
-    deleteContentsInterations * documentsService.folderContentsService.deleteByDocumentId(documentId)
-    0 * documentsService.documentsRepository.delete(documentId)  // delete should never happen. This is intentional.
+    deleteInterations * documentsService.folderContentsService.deleteByDocumentId(documentId)
+    deleteInterations * documentsService.documentsRepository.delete(documentId)
     0 * _
 
     where:
-    exists | deleteContentsInterations
+    exists | deleteInterations
     true   | 1
     false  | 0
   }

@@ -5,6 +5,8 @@ import com.target.mybox.service.FoldersService
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -99,10 +101,13 @@ class FoldersControllerSpec extends Specification {
   void 'deleteFolder'() {
 
     when:
-    foldersController.deleteFolder(folderId)
+    ResponseEntity<Void> responseEntity = foldersController.deleteFolder(folderId)
 
     then:
     1 * foldersController.foldersService.delete(folderId)
     0 * _
+
+    responseEntity.statusCode == HttpStatus.NO_CONTENT
+    !responseEntity.body
   }
 }

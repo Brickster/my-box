@@ -40,7 +40,7 @@ class PageableResolverSpec extends Specification {
   }
 
   @Unroll
-  void 'resolve pageable throws exception for bad page value #page'() {
+  void 'resolve pageable throws exception for method #methodName and bad page value #page'() {
 
     when:
     pageableResolver.resolveArgument(methodParameter, modelAndViewContainer, nativeWebRequest, webDataBinderFactory)
@@ -58,11 +58,9 @@ class PageableResolverSpec extends Specification {
     -1   | 'getDocuments'
     -2   | 'getDocuments'
     -10  | 'getDocuments'
-
-    // getFolders is intentionally backwards and throws exceptions for positive numbers
-    1    | 'getFolders'
-    2    | 'getFolders'
-    10   | 'getFolders'
+    -1   | 'getFolders'
+    -2   | 'getFolders'
+    -10  | 'getFolders'
   }
 
   @Unroll

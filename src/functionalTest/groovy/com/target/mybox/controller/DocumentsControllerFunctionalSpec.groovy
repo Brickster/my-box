@@ -296,22 +296,21 @@ class DocumentsControllerFunctionalSpec extends FunctionalSpec {
     ResponseEntity<Map<String, Object>> response = delete("/documents/${document.id}")
 
     then: 'the document is deleted'
-    response.statusCode == HttpStatus.GONE
+    response.statusCode == HttpStatus.NO_CONTENT
     !response.body
 
     when: 'the document is retrieved'
     response = get("/documents/${document.id}")
 
-    // this is an intentional bug
-    then: 'it is found'
-    response.statusCode == HttpStatus.OK
+    then: 'it is not found'
+    response.statusCode == HttpStatus.NOT_FOUND
     response.body
 
     when: 'deleting again'
     response = delete("/documents/${document.id}")
 
     then: 'the document is still gone'
-    response.statusCode == HttpStatus.GONE
+    response.statusCode == HttpStatus.NO_CONTENT
     !response.body
   }
 

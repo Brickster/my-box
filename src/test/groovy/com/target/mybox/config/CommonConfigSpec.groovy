@@ -7,7 +7,7 @@ import spock.lang.Specification
 
 class CommonConfigSpec extends Specification {
 
-  CommonConfig commonConfig = new CommonConfig(swaggerUiUrl: 'swagger-ui.com')
+  CommonConfig commonConfig = new CommonConfig(swaggerUiUrl: 'swagger-ui.com', faulty: true)
 
   void 'get object mapper'() {
     expect:
@@ -40,5 +40,6 @@ class CommonConfigSpec extends Specification {
     then:
     handlerMethodArgumentResolvers.size() == 1
     PageableResolver.isAssignableFrom(handlerMethodArgumentResolvers.first().class)
+    (handlerMethodArgumentResolvers.first() as PageableResolver).faulty == commonConfig.faulty
   }
 }

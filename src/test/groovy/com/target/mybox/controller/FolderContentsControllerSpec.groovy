@@ -5,6 +5,8 @@ import com.target.mybox.service.FolderContentsService
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 
 class FolderContentsControllerSpec extends Specification {
@@ -52,10 +54,13 @@ class FolderContentsControllerSpec extends Specification {
   void 'deleteFolderContent'() {
 
     when:
-    folderContentsController.deleteFolderContent(folderId, documentId)
+    ResponseEntity<Void> response = folderContentsController.deleteFolderContent(folderId, documentId)
 
     then:
     1 * folderContentsController.folderContentsService.delete(folderId, documentId)
     0 * _
+
+    response.statusCode == HttpStatus.NO_CONTENT
+    !response.body
   }
 }
